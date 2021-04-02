@@ -1,6 +1,6 @@
 # Niagara UI Renderer | Free Plugin for Unreal Engine 4
 
-Niagara UI Plugin adds Niagara Particle System Widget that allows you to render Niagara particle systems directly in UI. It supports sprite and ribbon CPU particles.
+Niagara UI Plugin adds Niagara Particle System Widget that allows you to render Niagara particle systems directly into the UI. The plugin supports sprite and ribbon CPU particles. It was tested on Windows and Android, but it should work fine on other platforms too.
 
 Demo Video:  
 [![Niagara UI Renderer Demo Video](http://img.youtube.com/vi/iFa40Sf4QPA/0.jpg)](http://www.youtube.com/watch?v=iFa40Sf4QPA "Niagara UI Renderer Demo")
@@ -14,23 +14,23 @@ You have 3 options how to install plugin:
 1. **Install precompiled plugin into Unreal Engine:**  
 Recommended if you want to use plugin across multiple projects.  
 Installation Steps:  
-* Download precompiled plugin for your version of Unreal Engine  
-* Extract whole plugin folder into ..\..\YourEngineInstallationPath\Engine\Plugins\  
+* Download the precompiled plugin for your version of Unreal Engine  
+* Extract the whole plugin folder into ..\..\YourEngineInstallationPath\Engine\Plugins\  
 * Enable Niagara UI Renderer in your projects Plugins settings  
 * Enjoy!
 
 2. **Install precompiled plugin into your project only:**  
 Recommended if you want to use plugin in this project only.  
 Installation Steps:  
-* Download precompiled plugin for your version of Unreal Engine  
-* Extract whole plugin folder into ..\..\YourProjectPath\Plugins\  
+* Download the precompiled plugin for your version of Unreal Engine  
+* Extract the whole plugin folder into ..\..\YourProjectPath\Plugins\  
 * Enable Niagara UI Renderer in your projects Plugins settings  
 * Enjoy!
 
 3. **Compile your own version from GitHub:**  
 Recommended if you're Unreal Engine God.  
 Installation Steps:  
-* Download plugin source from the GitHub repository  
+* Download the plugin source from the GitHub repository  
 * Copy the plugin into your plugins folder  
 * Regenerate Visual Studio project files  
 * Recompile  
