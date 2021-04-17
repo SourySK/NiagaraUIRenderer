@@ -56,4 +56,4 @@ Installation Steps:
 
 
 
-## For more information and images please visit [Unreal Forum post](https://forums.unrealengine.com/community/community-content-tools-and-tutorials/1876678-niagara-ui-renderer-free-plugin-for-ue4)
+## For more information and images please visit [Unreal Forum post](https://forums.unrealengine.com/t/niagara-ui-renderer-free-plugin-for-ue4/211365)
