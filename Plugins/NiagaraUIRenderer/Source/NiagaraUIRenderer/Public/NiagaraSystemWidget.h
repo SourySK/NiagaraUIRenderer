@@ -67,6 +67,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")
 	bool AutoActivate = true;
 
+	// Should be this particle system updated even when the game is paused?
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")
+	bool TickWhenPaused = false;
+
 	// Scale particles based on their position in Y-axis (towards the camera)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
 	bool FakeDepthScale = false;

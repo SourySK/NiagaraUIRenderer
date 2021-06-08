@@ -17,5 +17,5 @@ class ANiagaraUIActor : public AActor
 public:
 	ANiagaraUIActor();
 	
-    class UNiagaraUIComponent* SpawnNewNiagaraUIComponent(UNiagaraSystem* NiagaraSystemTemplate, bool AutoActivate, bool ShowDebugSystem);
+    class UNiagaraUIComponent* SpawnNewNiagaraUIComponent(UNiagaraSystem* NiagaraSystemTemplate, bool AutoActivate, bool ShowDebugSystem, bool TickWhenPaused);
 };

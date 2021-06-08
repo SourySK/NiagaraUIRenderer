@@ -13,7 +13,7 @@ ANiagaraUIActor::ANiagaraUIActor()
 		RootComponent = CreateDefaultSubobject<USceneComponent>(USceneComponent::GetDefaultSceneRootVariableName());
 }
 
-UNiagaraUIComponent* ANiagaraUIActor::SpawnNewNiagaraUIComponent(UNiagaraSystem* NiagaraSystemTemplate, bool AutoActivate, bool ShowDebugSystem)
+UNiagaraUIComponent* ANiagaraUIActor::SpawnNewNiagaraUIComponent(UNiagaraSystem* NiagaraSystemTemplate, bool AutoActivate, bool ShowDebugSystem, bool TickWhenPaused)
 {
 	UNiagaraUIComponent* newComponent = NewObject<UNiagaraUIComponent>(this);
 
@@ -23,6 +23,12 @@ UNiagaraUIComponent* ANiagaraUIActor::SpawnNewNiagaraUIComponent(UNiagaraSystem*
 	newComponent->RegisterComponent();
 	newComponent->SetAsset(NiagaraSystemTemplate);
 	newComponent->SetAutoDestroy(false);
+
+	if (TickWhenPaused)
+	{
+		newComponent->PrimaryComponentTick.bTickEvenWhenPaused = true;
+		newComponent->SetForceSolo(true);
+	}
 
 	return newComponent;
 }
