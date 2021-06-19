@@ -16,7 +16,7 @@ class UMaterialInterface;
 UCLASS()
 class NIAGARAUIRENDERER_API UNiagaraSystemWidget : public UWidget
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 public:
 	virtual TSharedRef<SWidget> RebuildWidget() override;

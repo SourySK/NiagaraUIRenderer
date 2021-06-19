@@ -7,6 +7,11 @@
 #include "NiagaraUIActor.h"
 #include "NiagaraUIComponent.h"
 
+UNiagaraSystemWidget::UNiagaraSystemWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	bIsVolatile = true;
+}
+
 TSharedRef<SWidget> UNiagaraSystemWidget::RebuildWidget()
 {
 	niagaraSlateWidget = SNew(SNiagaraUISystemWidget);
