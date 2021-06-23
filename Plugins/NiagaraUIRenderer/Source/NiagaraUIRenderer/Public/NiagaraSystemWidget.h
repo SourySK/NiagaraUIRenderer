@@ -16,9 +16,11 @@ class UMaterialInterface;
 UCLASS()
 class NIAGARAUIRENDERER_API UNiagaraSystemWidget : public UWidget
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 public:
+	UNiagaraSystemWidget(const FObjectInitializer& ObjectInitializer);
+	
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	
 	virtual void SynchronizeProperties() override;
