@@ -93,7 +93,7 @@ TSharedPtr<FSlateMaterialBrush> SNiagaraUISystemWidget::CreateSlateMaterialBrush
 void SNiagaraUISystemWidget::CheckForInvalidBrushes()
 {
     TArray<UMaterialInterface*> RemoveMaterials;
-    for (const auto Brush : MaterialBrushMap)
+    for (const auto& Brush : MaterialBrushMap)
     {
         if (Brush.Value.GetSharedReferenceCount() <= 1)
         {
