@@ -421,7 +421,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			FVector2D CurrentToNextVector = NextPosition - CurrentPosition;
 			const float CurrentToNextSize = CurrentToNextVector.Size();		
 			CurrentWidth = GetParticleWidth(CurrentDataIndex) * ScaleFactor;
-			FColor CurrentColor = GetParticleColor(CurrentIndex).ToFColor(true);
+			FColor CurrentColor = GetParticleColor(CurrentDataIndex).ToFColor(true);
 
 			// Normalize CurrToNextVec
 			CurrentToNextVector *= 1.f / CurrentToNextSize;
