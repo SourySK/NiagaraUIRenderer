@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright 2021 - Michal Smoleň
+
+#pragma once
 
 class UMaterialInterface;
 

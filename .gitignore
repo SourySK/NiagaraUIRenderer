@@ -2,6 +2,9 @@
 .vs/
 .idea/
 
+#Source assets
+Assets/
+
 # Compiled Object files
 *.slo
 *.lo

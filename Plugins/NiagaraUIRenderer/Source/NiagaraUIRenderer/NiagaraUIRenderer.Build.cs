@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2021 - Michal Smoleň
 
 using UnrealBuildTool;
 
