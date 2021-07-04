@@ -1,4 +1,4 @@
-# Niagara UI Renderer | Free Plugin for Unreal Engine 4
+# Niagara UI Renderer | Free Plugin for Unreal Engine
 
 Niagara UI Plugin adds Niagara Particle System Widget that allows you to render Niagara particle systems directly into the UI. The plugin supports sprite and ribbon CPU particles. It was tested on Windows and Android, but it should work fine on other platforms too.
 
