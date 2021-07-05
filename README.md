@@ -9,9 +9,15 @@ Demo Video:
 
 ## How to install:
 
-You have 3 options how to install plugin:
+You have 4 options how to install plugin:
+1. **Install the plugin from the Unreal Marketplace into Unreal Engine:**
+The easiest way to get this plugin. Installs directly into the engine so you can use it across multiple projects.
+* Get the plugin from the [Unreal Marketplace](https://www.unrealengine.com/marketplace/en-US/product/niagara-ui-renderer)
+* Download the plugin and install it into your engine
+* Enable Niagara UI Renderer in your project’s Plugins settings
+* Enjoy!
 
-1. **Install precompiled plugin into Unreal Engine:**  
+2. **Install precompiled plugin into Unreal Engine:**  
 Recommended if you want to use plugin across multiple projects.  
 Installation Steps:  
 * Download the precompiled plugin for your version of Unreal Engine  
@@ -19,7 +25,7 @@ Installation Steps:
 * Enable Niagara UI Renderer in your projects Plugins settings  
 * Enjoy!
 
-2. **Install precompiled plugin into your project only:**  
+3. **Install precompiled plugin into your project only:**  
 Recommended if you want to use plugin in this project only.  
 Installation Steps:  
 * Download the precompiled plugin for your version of Unreal Engine  
@@ -27,7 +33,7 @@ Installation Steps:
 * Enable Niagara UI Renderer in your projects Plugins settings  
 * Enjoy!
 
-3. **Compile your own version from GitHub:**  
+4. **Compile your own version from GitHub:**  
 Recommended if you're Unreal Engine God.  
 Installation Steps:  
 * Download the plugin source from the GitHub repository  
@@ -56,4 +62,8 @@ Installation Steps:
 
 
 
-## For more information and images please visit [Unreal Forum post](https://forums.unrealengine.com/t/niagara-ui-renderer-free-plugin-for-ue4/211365)
+## For more information and images please visit the [Unreal Forum post](https://forums.unrealengine.com/t/niagara-ui-renderer-free-plugin-for-ue4/211365)
+
+## You may be interested in the [Documentation](https://sourysk.github.io/NiagaraUIRendererDocumentation/)
+
+## Or download from the [Unreal Marketplace](https://www.unrealengine.com/marketplace/en-US/product/niagara-ui-renderer)
