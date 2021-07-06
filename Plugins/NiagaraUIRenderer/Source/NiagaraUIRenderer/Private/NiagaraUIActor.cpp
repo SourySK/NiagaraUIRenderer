@@ -4,8 +4,6 @@
 #include "NiagaraUIComponent.h"
 #include "Components/SceneComponent.h"
 
-PRAGMA_DISABLE_OPTIMIZATION
-
 ANiagaraUIActor::ANiagaraUIActor()
 {
 	if (!RootComponent)
@@ -14,21 +12,29 @@ ANiagaraUIActor::ANiagaraUIActor()
 
 UNiagaraUIComponent* ANiagaraUIActor::SpawnNewNiagaraUIComponent(UNiagaraSystem* NiagaraSystemTemplate, bool AutoActivate, bool ShowDebugSystem, bool TickWhenPaused)
 {
-	UNiagaraUIComponent* newComponent = NewObject<UNiagaraUIComponent>(this);
+	// Find old component
+	TArray<UNiagaraUIComponent*> OldComponents;
+	GetComponents<UNiagaraUIComponent>(OldComponents);
 
-	newComponent->SetupAttachment(RootComponent);
-	newComponent->SetAutoActivate(AutoActivate);
-	newComponent->SetHiddenInGame(!ShowDebugSystem);
-	newComponent->RegisterComponent();
-	newComponent->SetAsset(NiagaraSystemTemplate);
-	newComponent->SetAutoDestroy(false);
+	// And destroy it
+	for (UNiagaraUIComponent* Component : OldComponents)
+		Component->DestroyComponent();
+	
+	
+	UNiagaraUIComponent* NewComponent = NewObject<UNiagaraUIComponent>(this);
+
+	NewComponent->SetupAttachment(RootComponent);
+	NewComponent->SetAutoActivate(AutoActivate);
+	NewComponent->SetHiddenInGame(!ShowDebugSystem);
+	NewComponent->RegisterComponent();
+	NewComponent->SetAsset(NiagaraSystemTemplate);
+	NewComponent->SetAutoDestroy(false);
 
 	if (TickWhenPaused)
 	{
-		newComponent->PrimaryComponentTick.bTickEvenWhenPaused = true;
-		newComponent->SetForceSolo(true);
+		NewComponent->PrimaryComponentTick.bTickEvenWhenPaused = true;
+		NewComponent->SetForceSolo(true);
 	}
 
-	return newComponent;
+	return NewComponent;
 }
-PRAGMA_ENABLE_OPTIMIZATION

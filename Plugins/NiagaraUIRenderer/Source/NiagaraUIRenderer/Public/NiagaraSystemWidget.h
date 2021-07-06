@@ -85,6 +85,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
 	bool ShowDebugSystemInWorld = false;
 
+	// Disable warnings for this Widget
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
+	bool DisableWarnings = false;
 
 private:
 	TSharedPtr<SNiagaraUISystemWidget> niagaraSlateWidget;
