@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Actor.h"
-#include "NiagaraUiActor.generated.h"
+#include "NiagaraUIActor.generated.h"
 
 class UNiagaraSystem;
 class UNiagaraUIComponent;
