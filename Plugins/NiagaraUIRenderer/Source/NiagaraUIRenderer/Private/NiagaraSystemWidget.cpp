@@ -13,18 +13,18 @@ UNiagaraSystemWidget::UNiagaraSystemWidget(const FObjectInitializer& ObjectIniti
 
 TSharedRef<SWidget> UNiagaraSystemWidget::RebuildWidget()
 {
-	niagaraSlateWidget = SNew(SNiagaraUISystemWidget);
+	NiagaraSlateWidget = SNew(SNiagaraUISystemWidget);
 
 	InitializeNiagaraUI();
 
-	return niagaraSlateWidget.ToSharedRef();
+	return NiagaraSlateWidget.ToSharedRef();
 }
 
 void UNiagaraSystemWidget::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (!niagaraSlateWidget.IsValid())
+	if (!NiagaraSlateWidget.IsValid())
 	{
 		return;
 	}
@@ -38,7 +38,7 @@ void UNiagaraSystemWidget::ReleaseSlateResources(bool bReleaseChildren)
 {
 	Super::ReleaseSlateResources(bReleaseChildren);
 	
-	niagaraSlateWidget.Reset();
+	NiagaraSlateWidget.Reset();
 
 	if (NiagaraActor)
 		NiagaraActor->Destroy();
@@ -85,7 +85,7 @@ void UNiagaraSystemWidget::InitializeNiagaraUI()
 
 		NiagaraComponent = NiagaraActor->SpawnNewNiagaraUIComponent(NiagaraSystemReference, AutoActivate, ShowDebugSystemInWorld, TickWhenPaused);
 
-		niagaraSlateWidget->SetNiagaraComponentReference(NiagaraComponent, FNiagaraWidgetProperties(&MaterialRemapList, AutoActivate, ShowDebugSystemInWorld, FakeDepthScale, FakeDepthScaleDistance));
+		NiagaraSlateWidget->SetNiagaraComponentReference(NiagaraComponent, FNiagaraWidgetProperties(&MaterialRemapList, AutoActivate, ShowDebugSystemInWorld, FakeDepthScale, FakeDepthScaleDistance));
 	}
 }
 
@@ -104,4 +104,27 @@ void UNiagaraSystemWidget::DeactivateSystem()
 UNiagaraUIComponent* UNiagaraSystemWidget::GetNiagaraComponent()
 {
 	return NiagaraComponent;
+}
+
+void UNiagaraSystemWidget::UpdateNiagaraSystemReference(UNiagaraSystem* NewNiagaraSystem)
+{
+	NiagaraSystemReference = NewNiagaraSystem;
+
+	if (NiagaraComponent)
+	{
+		NiagaraComponent->SetAsset(NewNiagaraSystem);
+		NiagaraComponent->ResetSystem();
+	}
+}
+
+void UNiagaraSystemWidget::UpdateTickWhenPaused(bool NewTickWhenPaused)
+{
+	TickWhenPaused = NewTickWhenPaused;
+
+	if (NiagaraComponent)
+	{
+		NiagaraComponent->SetTickableWhenPaused(NewTickWhenPaused);
+		NiagaraComponent->SetForceSolo(NewTickWhenPaused);
+		NiagaraComponent->ResetSystem();
+	}
 }

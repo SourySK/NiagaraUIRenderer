@@ -37,19 +37,29 @@ private:
 	void InitializeNiagaraUI();
 
 public:
-	
+	// Activate Niagara System with option to reset the simulation
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	void ActivateSystem(bool Reset);
-	
+
+	// Deactivate Niagara System
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
     void DeactivateSystem();
-	
+
+	// Return Niagara Component reference for the particle system.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Niagara UI Renderer")
     class UNiagaraUIComponent* GetNiagaraComponent();
 
+	// Updates the Niagara System reference. This will cause the particle system to reset
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	void UpdateNiagaraSystemReference(class UNiagaraSystem* NewNiagaraSystem);
+
+	// Updates Tick When Paused - Should be this particle system updated even when the game is paused? Note that this will reset the particle simulation
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	void UpdateTickWhenPaused(bool NewTickWhenPaused);
+
 public:
 	// Reference to the niagara system asset
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", DisplayName = "Niagara System")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", DisplayName = "Niagara System", BlueprintSetter = UpdateNiagaraSystemReference)
 	class UNiagaraSystem* NiagaraSystemReference;
 
 	/*
@@ -62,7 +72,7 @@ public:
 		The alternative is to apply materials with "User Interface" material domain directly in niagara renderers, but this will result in particle system
 		not rendering correctly, if used outside UI renderer.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer")
 	TMap<UMaterialInterface*, UMaterialInterface*> MaterialRemapList;
 
 	// Should be this particle system automatically activated?
@@ -70,7 +80,7 @@ public:
 	bool AutoActivate = true;
 
 	// Should be this particle system updated even when the game is paused?
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", BlueprintSetter = UpdateTickWhenPaused)
 	bool TickWhenPaused = false;
 
 	// Scale particles based on their position in Y-axis (towards the camera)
@@ -90,7 +100,7 @@ public:
 	bool DisableWarnings = false;
 
 private:
-	TSharedPtr<SNiagaraUISystemWidget> niagaraSlateWidget;
+	TSharedPtr<SNiagaraUISystemWidget> NiagaraSlateWidget;
 
 	UPROPERTY()
 	class ANiagaraUIActor* NiagaraActor;
