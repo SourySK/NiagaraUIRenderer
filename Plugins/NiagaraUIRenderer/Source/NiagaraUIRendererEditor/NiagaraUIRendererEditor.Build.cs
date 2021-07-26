@@ -46,6 +46,7 @@ public class NiagaraUIRendererEditor : ModuleRules
 				"EditorStyle",
 				"PropertyEditor",
 				"Projects",
+				"MaterialEditor",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

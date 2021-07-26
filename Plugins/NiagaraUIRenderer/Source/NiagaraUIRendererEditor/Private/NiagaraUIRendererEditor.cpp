@@ -2,6 +2,7 @@
 
 #include "NiagaraUIRendererEditor.h"
 
+#include "NiagaraUIContentBrowserExtension.h"
 #include "NiagaraUIRendererEditorStyle.h"
 #include "NiagaraWidgetDetailCustomization.h"
 
@@ -16,6 +17,12 @@ void FNiagaraUIRendererEditorModule::StartupModule()
 	
 	propertyModule.RegisterCustomClassLayout("NiagaraSystemWidget", FOnGetDetailCustomizationInstance::CreateStatic(&FNiagaraWidgetDetailCustomization::MakeInstance));
 	propertyModule.NotifyCustomizationModuleChanged();
+
+	// Content browser extensions
+	if (!IsRunningCommandlet())
+	{
+		FNiagaraUIContentBrowserExtension::InstallHooks();
+	}
 }
 
 void FNiagaraUIRendererEditorModule::ShutdownModule()
@@ -25,6 +32,12 @@ void FNiagaraUIRendererEditorModule::ShutdownModule()
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 
 		PropertyModule.UnregisterCustomClassLayout("NiagaraSystemWidget");
+	}
+
+	// Content browser extensions
+	if (!IsRunningCommandlet())
+	{
+		FNiagaraUIContentBrowserExtension::RemoveHooks();
 	}
 
 	FNiagaraUIRendererEditorStyle::Shutdown();

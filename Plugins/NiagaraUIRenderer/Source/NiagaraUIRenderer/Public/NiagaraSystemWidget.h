@@ -11,7 +11,7 @@ class SNiagaraUISystemWidget;
 class UMaterialInterface;
 
 /**
- * 
+ The Niagara System Widget allows to render niagara particle system directly into the UI. Only sprite and ribbon CPU particles are supported.
  */
 UCLASS()
 class NIAGARAUIRENDERER_API UNiagaraSystemWidget : public UWidget
