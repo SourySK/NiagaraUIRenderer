@@ -15,6 +15,7 @@ void SNiagaraUISystemWidget::Construct(const FArguments& Args)
 SNiagaraUISystemWidget::~SNiagaraUISystemWidget()
 {
     ClearRenderData();
+    CheckForInvalidBrushes();
 }
 
 int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
