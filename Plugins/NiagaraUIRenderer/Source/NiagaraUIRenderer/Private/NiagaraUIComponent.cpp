@@ -114,13 +114,13 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	FVector2D SubImageSize = SpriteRenderer->SubImageSize;
 	FVector2D SubImageDelta = FVector2D::UnitVector / SubImageSize;
 
-	const auto PositionData = FNiagaraDataSetAccessor<FVector>::		CreateReader(DataSet, SpriteRenderer->PositionBinding.GetDataSetBindableVariable().GetName());
+	const auto PositionData = FNiagaraDataSetAccessor<FNiagaraPosition>::		CreateReader(DataSet, SpriteRenderer->PositionBinding.GetDataSetBindableVariable().GetName());
 	const auto ColorData	= FNiagaraDataSetAccessor<FLinearColor>::	CreateReader(DataSet, SpriteRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
-	const auto VelocityData = FNiagaraDataSetAccessor<FVector>::		CreateReader(DataSet, SpriteRenderer->VelocityBinding.GetDataSetBindableVariable().GetName());
-	const auto SizeData		= FNiagaraDataSetAccessor<FVector2D>::		CreateReader(DataSet, SpriteRenderer->SpriteSizeBinding.GetDataSetBindableVariable().GetName());
+	const auto VelocityData = FNiagaraDataSetAccessor<FVector3f>::		CreateReader(DataSet, SpriteRenderer->VelocityBinding.GetDataSetBindableVariable().GetName());
+	const auto SizeData		= FNiagaraDataSetAccessor<FVector2f>::		CreateReader(DataSet, SpriteRenderer->SpriteSizeBinding.GetDataSetBindableVariable().GetName());
 	const auto RotationData = FNiagaraDataSetAccessor<float>::			CreateReader(DataSet, SpriteRenderer->SpriteRotationBinding.GetDataSetBindableVariable().GetName());
 	const auto SubImageData = FNiagaraDataSetAccessor<float>::			CreateReader(DataSet, SpriteRenderer->SubImageIndexBinding.GetDataSetBindableVariable().GetName());
-	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4>::CreateReader(DataSet, SpriteRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
+	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4f>::CreateReader(DataSet, SpriteRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
 
 	auto GetParticlePosition2D = [&PositionData](int32 Index)
 	{
