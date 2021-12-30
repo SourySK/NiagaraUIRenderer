@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.26",
+	"EngineAssociation": "",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -26,7 +26,6 @@
 			"Name": "OculusVR",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
-				"Win32",
 				"Win64",
 				"Android"
 			]
@@ -35,7 +34,6 @@
 			"Name": "SteamVR",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
-				"Win32",
 				"Win64",
 				"Linux"
 			]
