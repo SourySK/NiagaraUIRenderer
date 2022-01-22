@@ -153,7 +153,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetParticleSize = [&SizeData](int32 Index)
 	{
-		return SizeData.GetSafe(Index, FVector2D::ZeroVector);
+		return SizeData.GetSafe(Index, FVector2D::UnitVector);
 	};
 	
 	auto GetParticleRotation = [&RotationData](int32 Index)
