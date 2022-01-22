@@ -321,6 +321,9 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	const auto SortKeyReader = RibbonRenderer->SortKeyDataSetAccessor.GetReader(DataSet);
 
+	if (!ensureMsgf(SortKeyReader.IsValid(), TEXT("Invalid Sort Key Reader encrountered while rendering ribbon particles. This can happen if the particle is missing \"Particle State\" module.")))
+		return;
+
 	const auto PositionData		= RibbonRenderer->PositionDataSetAccessor.GetReader(DataSet);
 	const auto ColorData		= FNiagaraDataSetAccessor<FLinearColor>::CreateReader(DataSet, RibbonRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
 	const auto RibbonWidthData	= RibbonRenderer->SizeDataSetAccessor.GetReader(DataSet);
@@ -340,7 +343,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetParticleWidth = [&RibbonWidthData](int32 Index)
 	{
-		return RibbonWidthData.GetSafe(Index, 0.f);
+		return RibbonWidthData.GetSafe(Index, 1.f);
 	};
 
 	const bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
