@@ -1,4 +1,4 @@
-﻿// Copyright 2021 - Michal Smoleň
+﻿// Copyright 2022 - Michal Smoleň
 
 #include "NiagaraUIActor.h"
 #include "NiagaraUIComponent.h"
