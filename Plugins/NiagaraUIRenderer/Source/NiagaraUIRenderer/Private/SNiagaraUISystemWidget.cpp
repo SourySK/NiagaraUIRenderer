@@ -15,6 +15,7 @@ void SNiagaraUISystemWidget::Construct(const FArguments& Args)
 SNiagaraUISystemWidget::~SNiagaraUISystemWidget()
 {
     ClearRenderData();
+    CheckForInvalidBrushes();
 }
 
 int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
@@ -76,13 +77,15 @@ TSharedPtr<FSlateMaterialBrush> SNiagaraUISystemWidget::CreateSlateMaterialBrush
     {
         const auto MapElement = MaterialBrushMap.Find(MaterialToUse);
 
-        if (MapElement->IsValid() && MapElement->Get()->GetResourceObject()->IsValidLowLevel() && MapElement->Get()->GetResourceObject()->IsA<UMaterialInterface>())
+        if (MapElement->IsValid())
         {
             return *MapElement;
         }
     }
     
     const auto MaterialInstanceDynamic = UMaterialInstanceDynamic::Create(MaterialToUse, GetTransientPackage());
+    MaterialInstanceDynamic->AddToRoot();
+    
     TSharedPtr<FSlateMaterialBrush> NewElement = MakeShareable(new FSlateMaterialBrush(*MaterialInstanceDynamic, FVector2D(1.f, 1.f)));
 
     MaterialBrushMap.Add(MaterialToUse, NewElement);
