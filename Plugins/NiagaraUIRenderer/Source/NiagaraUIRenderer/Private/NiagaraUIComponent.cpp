@@ -14,6 +14,11 @@ DECLARE_CYCLE_STAT(TEXT("Generate Ribbon Data"), STAT_GenerateRibbonData, STATGR
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
+void UNiagaraUIComponent::SetAutoActivateParticle(bool AutoActivate)
+{
+	AutoActivateParticle = AutoActivate;
+}
+
 void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FVector2D Scale, float Angle)
 {
 	const FVector NewLocation(Location.X, 0.f, -Location.Y);
@@ -22,10 +27,12 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	
 	SetRelativeTransform(FTransform(NewRotation, NewLocation, NewScale));
 
-	if (bAutoActivate)
+	if (AutoActivateParticle)
 	{
-		ActivateSystem();
-		bAutoActivate = false;
+		if (!IsActive())
+			ActivateSystem();
+		
+		AutoActivateParticle = false;
 	}
 }
 
