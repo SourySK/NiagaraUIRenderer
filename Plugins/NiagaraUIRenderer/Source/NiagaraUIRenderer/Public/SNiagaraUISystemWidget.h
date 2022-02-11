@@ -36,10 +36,15 @@ public:
 
 	void SetNiagaraComponentReference(TWeakObjectPtr<UNiagaraUIComponent> NiagaraComponentIn, FNiagaraWidgetProperties Properties);
 
+	void SetWidgetStyle(const FWidgetStyle& InWidgetStyle) const { WidgetStyle = InWidgetStyle; }
+	const FWidgetStyle& GetWidgetStyle() const { return WidgetStyle; }
+
 private:
 	TWeakObjectPtr<UNiagaraUIComponent> NiagaraComponent;
 
 	static TMap<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>> MaterialBrushMap;
 
 	FNiagaraWidgetProperties WidgetProperties = FNiagaraWidgetProperties(nullptr, true, false, false, 1.f);
+
+	mutable FWidgetStyle WidgetStyle;
 };

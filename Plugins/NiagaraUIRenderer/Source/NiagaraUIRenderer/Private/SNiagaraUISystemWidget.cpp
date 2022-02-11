@@ -23,6 +23,8 @@ int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& A
     if (!NiagaraComponent.IsValid())
         return LayerId;
 
+    SetWidgetStyle(InWidgetStyle);
+
     const FSlateLayoutTransform LayoutTransform = AllottedGeometry.GetAccumulatedLayoutTransform();
     
     const float LayoutScale = LayoutTransform.GetScale();

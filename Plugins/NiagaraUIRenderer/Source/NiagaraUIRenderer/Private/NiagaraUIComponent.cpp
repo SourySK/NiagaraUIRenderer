@@ -140,9 +140,10 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		return PositionData.GetSafe(Index, FVector::ZeroVector).Y;
 	};	
 
-	auto GetParticleColor = [&ColorData](int32 Index)
+	auto GetParticleColor = [&ColorData, NiagaraWidget](int32 Index)
 	{
-		return ColorData.GetSafe(Index, FLinearColor::White);
+		const FLinearColor& ColorAndOpacityTint = NiagaraWidget->GetWidgetStyle().GetColorAndOpacityTint();
+		return ColorData.GetSafe(Index, FLinearColor::White) * ColorAndOpacityTint;
 	};
 	
 	auto GetParticleVelocity2D = [&VelocityData](int32 Index)
@@ -334,13 +335,14 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	{
 		const FVector Position3D = PositionData.GetSafe(Index, FVector::ZeroVector);
 		return FVector2D(Position3D.X, -Position3D.Z);
-	};	
-
-	auto GetParticleColor = [&ColorData](int32 Index)
-	{
-		return ColorData.GetSafe(Index, FLinearColor::White);
 	};
-	
+
+	auto GetParticleColor = [&ColorData, &NiagaraWidget](int32 Index)
+	{
+		const FLinearColor& ColorAndOpacityTint = NiagaraWidget->GetWidgetStyle().GetColorAndOpacityTint();
+		return ColorData.GetSafe(Index, FLinearColor::White) * ColorAndOpacityTint;
+	};
+
 	auto GetParticleWidth = [&RibbonWidthData](int32 Index)
 	{
 		return RibbonWidthData.GetSafe(Index, 1.f);
