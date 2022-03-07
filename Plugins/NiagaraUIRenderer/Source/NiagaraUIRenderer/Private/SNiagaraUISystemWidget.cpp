@@ -27,11 +27,11 @@ int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& A
     
     const float LayoutScale = LayoutTransform.GetScale();
 
-    const FVector2D ParentTopLeft = FVector2D(MyCullingRect.Left, MyCullingRect.Top);
+    const FVector2f ParentTopLeft = FVector2f(MyCullingRect.Left, MyCullingRect.Top);
 
     const FSlateRenderTransform SlateRenderTransform = AllottedGeometry.GetAccumulatedRenderTransform();
     
-    const FVector2D Location2D = (AllottedGeometry.GetAbsolutePositionAtCoordinates(FVector2D(0.5f, 0.5f)) - ParentTopLeft) / LayoutScale;
+    const FVector2D Location2D = (AllottedGeometry.GetAbsolutePositionAtCoordinates(FVector2D(0.5f, 0.5f)) - FVector2D(ParentTopLeft)) / LayoutScale;
     const FScale2D Scale2D = SlateRenderTransform.GetMatrix().GetScale();
     const float Angle = SlateRenderTransform.GetMatrix().GetRotationAngle();
 
