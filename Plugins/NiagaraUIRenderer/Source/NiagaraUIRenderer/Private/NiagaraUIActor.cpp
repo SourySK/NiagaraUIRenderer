@@ -1,4 +1,4 @@
-﻿// Copyright 2021 - Michal Smoleň
+﻿// Copyright 2022 - Michal Smoleň
 
 #include "NiagaraUIActor.h"
 #include "NiagaraUIComponent.h"
@@ -22,12 +22,15 @@ UNiagaraUIComponent* ANiagaraUIActor::SpawnNewNiagaraUIComponent(UNiagaraSystem*
 	
 	
 	UNiagaraUIComponent* NewComponent = NewObject<UNiagaraUIComponent>(this);
+	
+	// Don't use unreal activation, we'll do it ourself
+	NewComponent->SetAutoActivate(false);
 
 	NewComponent->SetupAttachment(RootComponent);
-	NewComponent->SetAutoActivate(AutoActivate);
 	NewComponent->SetHiddenInGame(!ShowDebugSystem);
 	NewComponent->RegisterComponent();
-	NewComponent->SetAsset(NiagaraSystemTemplate);
+	NewComponent->SetAutoActivateParticle(AutoActivate);	
+	NewComponent->SetAsset(NiagaraSystemTemplate);	
 	NewComponent->SetAutoDestroy(false);
 
 	if (TickWhenPaused)

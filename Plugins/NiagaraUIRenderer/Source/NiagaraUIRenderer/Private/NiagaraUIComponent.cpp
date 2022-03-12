@@ -1,4 +1,4 @@
-// Copyright 2021 - Michal Smoleň
+// Copyright 2022 - Michal Smoleň
 
 #include "NiagaraUIComponent.h"
 #include "Stats/Stats.h"
@@ -14,6 +14,11 @@ DECLARE_CYCLE_STAT(TEXT("Generate Ribbon Data"), STAT_GenerateRibbonData, STATGR
 
 //PRAGMA_DISABLE_OPTIMIZATION
 
+void UNiagaraUIComponent::SetAutoActivateParticle(bool AutoActivate)
+{
+	AutoActivateParticle = AutoActivate;
+}
+
 void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FVector2f Scale, float Angle)
 {
 	const FVector NewLocation(Location.X, 0.f, -Location.Y);
@@ -22,10 +27,12 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	
 	SetRelativeTransform(FTransform(NewRotation, NewLocation, NewScale));
 
-	if (bAutoActivate)
+	if (AutoActivateParticle)
 	{
-		ActivateSystem();
-		bAutoActivate = false;
+		if (!IsActive())
+			ActivateSystem();
+
+		AutoActivateParticle = false;
 	}
 }
 
@@ -146,7 +153,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetParticleSize = [&SizeData](int32 Index)
 	{
-		return SizeData.GetSafe(Index, FVector2f::ZeroVector);
+		return SizeData.GetSafe(Index, FVector2f::UnitVector);
 	};
 	
 	auto GetParticleRotation = [&RotationData](int32 Index)
@@ -313,6 +320,9 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 
 	const auto SortKeyReader = RibbonRenderer->SortKeyDataSetAccessor.GetReader(DataSet);
+	
+	if (!ensureMsgf(SortKeyReader.IsValid(), TEXT("Invalid Sort Key Reader encrountered while rendering ribbon particles. This can happen if the particle is missing \"Particle State\" module.")))
+		return;
 
 	const auto PositionData		= RibbonRenderer->PositionDataSetAccessor.GetReader(DataSet);
 	const auto ColorData		= FNiagaraDataSetAccessor<FLinearColor>::CreateReader(DataSet, RibbonRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
@@ -333,7 +343,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetParticleWidth = [&RibbonWidthData](int32 Index)
 	{
-		return RibbonWidthData.GetSafe(Index, 0.f);
+		return RibbonWidthData.GetSafe(Index, 1.f);
 	};
 
 	const bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;

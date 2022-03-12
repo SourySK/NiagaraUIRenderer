@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Michal Smoleň 
+// Copyright (c) 2022 Michal Smoleň 
 
 
 #include "NiagaraWidgetDetailCustomization.h"
