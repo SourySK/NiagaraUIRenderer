@@ -2,6 +2,7 @@
 
 #include "NiagaraUIComponent.h"
 #include "Stats/Stats.h"
+#include "Async/ParallelFor.h"
 #include "NiagaraRenderer.h"
 #include "NiagaraRibbonRendererProperties.h"
 #include "NiagaraSpriteRendererProperties.h"
@@ -179,7 +180,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	NiagaraWidget->AddRenderData(&VertexData, &IndexData, SpriteMaterial, ParticleCount * 4, ParticleCount * 6);
 
-	for (int ParticleIndex = 0; ParticleIndex < ParticleCount; ++ParticleIndex)
+	ParallelFor(ParticleCount, [&](int32 ParticleIndex)
 	{
 
 		FVector2D ParticlePosition = GetParticlePosition2D(ParticleIndex) * ScaleFactor;
@@ -300,7 +301,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		IndexData[indexIndex + 3] = VertexIndex + 2;
 		IndexData[indexIndex + 4] = VertexIndex + 1;
 		IndexData[indexIndex + 5] = VertexIndex + 3;
-	}
+	});
 }
 
 void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
