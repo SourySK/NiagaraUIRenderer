@@ -131,7 +131,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	auto GetParticlePosition2D = [&PositionData](int32 Index)
 	{
-		const FVector Position3D = PositionData.GetSafe(Index, FVector::ZeroVector);
+		const FVector3f Position3D = PositionData.GetSafe(Index, FVector3f::ZeroVector);
 		return FVector2f(Position3D.X, -Position3D.Z);
 	};
 	
@@ -147,7 +147,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetParticleVelocity2D = [&VelocityData](int32 Index)
 	{
-		const FVector Velocity3D = VelocityData.GetSafe(Index, FVector::ZeroVector);
+		const FVector3f Velocity3D = VelocityData.GetSafe(Index, FVector3f::ZeroVector);
 		return FVector2D(Velocity3D.X, Velocity3D.Z);
 	};
 	
@@ -270,7 +270,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		}
 
 		
-		const FVector4 MaterialData = GetDynamicMaterialData(ParticleIndex);
+		const FVector4f MaterialData = GetDynamicMaterialData(ParticleIndex);
 
 		FVector2D PositionArray[4];
 		PositionArray[0] = FastRotate(FVector2D(-ParticleHalfSize.X, -ParticleHalfSize.Y), ParticleRotationSin, ParticleRotationCos);
@@ -332,7 +332,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	auto GetParticlePosition2D = [&PositionData](int32 Index)
 	{
-		const FVector Position3D = PositionData.GetSafe(Index, FVector::ZeroVector);
+		const FVector3f Position3D = PositionData.GetSafe(Index, FVector3f::ZeroVector);
 		return FVector2f(Position3D.X, -Position3D.Z);
 	};	
 
@@ -481,13 +481,13 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 				CurrentU1 = (float)CurrentIndex / (float)numParticlesInRibbon;
 			}
 
-			FVector2D TextureCoordinates0[2];
-			TextureCoordinates0[0] = FVector2D(CurrentU0, 1.f);
-			TextureCoordinates0[1] = FVector2D(CurrentU0, 0.f);
+			FVector2f TextureCoordinates0[2];
+			TextureCoordinates0[0] = FVector2f(CurrentU0, 1.f);
+			TextureCoordinates0[1] = FVector2f(CurrentU0, 0.f);
 			
-            FVector2D TextureCoordinates1[2];
-			TextureCoordinates1[0] = FVector2D(CurrentU1, 1.f);
-			TextureCoordinates1[1] = FVector2D(CurrentU1, 0.f);
+            FVector2f TextureCoordinates1[2];
+			TextureCoordinates1[0] = FVector2f(CurrentU1, 1.f);
+			TextureCoordinates1[1] = FVector2f(CurrentU1, 0.f);
 			
 			for (int i = 0; i < 2; ++i)
 			{
