@@ -108,6 +108,10 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	float ComponentPitchRadians = FMath::DegreesToRadians(ComponentRotation.Pitch);
 
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
+
+	if (!DataSet.IsCurrentDataValid())
+		return;
+	
 	FNiagaraDataBuffer& ParticleData = DataSet.GetCurrentDataChecked();
 	const int32 ParticleCount = ParticleData.GetNumInstances();
 
@@ -312,6 +316,10 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	FRotator ComponentRotation = GetRelativeRotation();
 
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
+	
+	if (!DataSet.IsCurrentDataValid())
+		return;
+	
 	FNiagaraDataBuffer& ParticleData = DataSet.GetCurrentDataChecked();
 	const int32 ParticleCount = ParticleData.GetNumInstances();
 
