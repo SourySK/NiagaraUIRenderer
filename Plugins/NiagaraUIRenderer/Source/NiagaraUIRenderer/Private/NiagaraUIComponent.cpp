@@ -36,6 +36,7 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	}
 }
 
+#if ENGINE_MINOR_VERSION < 1
 struct FNiagaraRendererEntry
 {
 	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstIn, UNiagaraEmitter* EmitterIn)
@@ -44,6 +45,16 @@ struct FNiagaraRendererEntry
 	TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstance;
 	UNiagaraEmitter* Emitter;
 };
+#else
+struct FNiagaraRendererEntry
+{
+	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstIn, FVersionedNiagaraEmitter EmitterIn)
+		: RendererProperties(PropertiesIn), EmitterInstance(EmitterInstIn), Emitter(EmitterIn) {}
+	UNiagaraRendererProperties* RendererProperties;
+	TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstance;
+	FVersionedNiagaraEmitter Emitter;
+};
+#endif
 
 void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
@@ -59,6 +70,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 
 	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
+#if ENGINE_MINOR_VERSION < 1
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
@@ -69,16 +81,35 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
                 Renderers.Add(NewEntry);
 			}
 		}
+#else
+		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+
+		TArray<UNiagaraRendererProperties*> Properties = Emitter.GetEmitterData()->GetRenderers();
+
+		for (UNiagaraRendererProperties* Property : Properties)
+		{
+			FNiagaraRendererEntry NewEntry(Property, EmitterInst, Emitter);
+			Renderers.Add(NewEntry);
+		}
+#endif
 	}
 
 	Algo::Sort(Renderers, [] (FNiagaraRendererEntry& FirstElement, FNiagaraRendererEntry& SecondElement) {return FirstElement.RendererProperties->SortOrderHint < SecondElement.RendererProperties->SortOrderHint;});
 			
 	for (FNiagaraRendererEntry Renderer : Renderers)
 	{
+#if ENGINE_MINOR_VERSION < 1
 		if (Renderer.RendererProperties && Renderer.RendererProperties->GetIsEnabled() && Renderer.RendererProperties->IsSimTargetSupported(Renderer.Emitter->SimTarget))
 		{
 			if (Renderer.Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
 			{
+#else
+		if (Renderer.RendererProperties && Renderer.RendererProperties->GetIsEnabled() && Renderer.RendererProperties->IsSimTargetSupported(Renderer.Emitter.GetEmitterData()->SimTarget))
+		{
+			if (Renderer.Emitter.GetEmitterData()->SimTarget == ENiagaraSimTarget::CPUSim)
+			{
+#endif
+				
 				if (UNiagaraSpriteRendererProperties* SpriteRenderer = Cast<UNiagaraSpriteRendererProperties>(Renderer.RendererProperties))
 				{
 					AddSpriteRendererData(NiagaraWidget, Renderer.EmitterInstance, SpriteRenderer, ScaleFactor, ParentTopLeft, WidgetProperties);
@@ -118,7 +149,13 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	if (ParticleCount < 1)
 		return;
 
+	
+#if ENGINE_MINOR_VERSION < 1		
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#endif
+			
 
 	const float FakeDepthScaler = 1 / WidgetProperties->FakeDepthScaleDistance;
 
@@ -354,7 +391,12 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		return RibbonWidthData.GetSafe(Index, 1.f);
 	};
 
-	const bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
+#if ENGINE_MINOR_VERSION < 1		
+	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#endif
+			
 	const bool FullIDs = RibbonFullIDData.IsValid();
 	const bool MultiRibbons = FullIDs;
 
