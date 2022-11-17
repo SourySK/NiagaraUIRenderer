@@ -21,15 +21,15 @@ class NIAGARAUIRENDERER_API UNiagaraUIComponent : public UNiagaraComponent
 public:
 	void SetAutoActivateParticle(bool AutoActivate);
 	
-	void SetTransformationForUIRendering(FVector2D Location, FVector2D Scale, float Angle);
+	void SetTransformationForUIRendering(FVector2D Location, FVector2f Scale, float Angle);
 
-	void RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
+	void RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
 
 	void AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst,
-								class UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
+								class UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
 
 	void AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst,
-                                class UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
+                                class UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
 
 	
 	

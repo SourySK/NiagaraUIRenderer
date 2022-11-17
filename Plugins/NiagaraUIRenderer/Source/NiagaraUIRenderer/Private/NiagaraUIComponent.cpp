@@ -19,7 +19,7 @@ void UNiagaraUIComponent::SetAutoActivateParticle(bool AutoActivate)
 	AutoActivateParticle = AutoActivate;
 }
 
-void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FVector2D Scale, float Angle)
+void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FVector2f Scale, float Angle)
 {
 	const FVector NewLocation(Location.X, 0.f, -Location.Y);
 	const FVector NewScale(Scale.X, 1.f, Scale.Y);
@@ -31,11 +31,12 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	{
 		if (!IsActive())
 			ActivateSystem();
-		
+
 		AutoActivateParticle = false;
 	}
 }
 
+#if ENGINE_MINOR_VERSION < 1
 struct FNiagaraRendererEntry
 {
 	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstIn, UNiagaraEmitter* EmitterIn)
@@ -44,21 +45,32 @@ struct FNiagaraRendererEntry
 	TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstance;
 	UNiagaraEmitter* Emitter;
 };
+#else
+struct FNiagaraRendererEntry
+{
+	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstIn, FVersionedNiagaraEmitter EmitterIn)
+		: RendererProperties(PropertiesIn), EmitterInstance(EmitterInstIn), Emitter(EmitterIn) {}
+	UNiagaraRendererProperties* RendererProperties;
+	TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstance;
+	FVersionedNiagaraEmitter Emitter;
+};
+#endif
 
-void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	NiagaraWidget->ClearRenderData();
 
 	if (!IsActive())
 		return;
 
-	if (!GetSystemInstance())
+	if (!GetSystemInstanceController())
 		return;
 	
 	TArray<FNiagaraRendererEntry> Renderers;
 
-	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : GetSystemInstance()->GetEmitters())
+	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
+#if ENGINE_MINOR_VERSION < 1
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
@@ -69,16 +81,35 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
                 Renderers.Add(NewEntry);
 			}
 		}
+#else
+		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+
+		TArray<UNiagaraRendererProperties*> Properties = Emitter.GetEmitterData()->GetRenderers();
+
+		for (UNiagaraRendererProperties* Property : Properties)
+		{
+			FNiagaraRendererEntry NewEntry(Property, EmitterInst, Emitter);
+			Renderers.Add(NewEntry);
+		}
+#endif
 	}
 
 	Algo::Sort(Renderers, [] (FNiagaraRendererEntry& FirstElement, FNiagaraRendererEntry& SecondElement) {return FirstElement.RendererProperties->SortOrderHint < SecondElement.RendererProperties->SortOrderHint;});
 			
 	for (FNiagaraRendererEntry Renderer : Renderers)
 	{
+#if ENGINE_MINOR_VERSION < 1
 		if (Renderer.RendererProperties && Renderer.RendererProperties->GetIsEnabled() && Renderer.RendererProperties->IsSimTargetSupported(Renderer.Emitter->SimTarget))
 		{
 			if (Renderer.Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
 			{
+#else
+		if (Renderer.RendererProperties && Renderer.RendererProperties->GetIsEnabled() && Renderer.RendererProperties->IsSimTargetSupported(Renderer.Emitter.GetEmitterData()->SimTarget))
+		{
+			if (Renderer.Emitter.GetEmitterData()->SimTarget == ENiagaraSimTarget::CPUSim)
+			{
+#endif
+				
 				if (UNiagaraSpriteRendererProperties* SpriteRenderer = Cast<UNiagaraSpriteRendererProperties>(Renderer.RendererProperties))
 				{
 					AddSpriteRendererData(NiagaraWidget, Renderer.EmitterInstance, SpriteRenderer, ScaleFactor, ParentTopLeft, WidgetProperties);
@@ -99,7 +130,7 @@ FORCEINLINE FVector2D FastRotate(const FVector2D Vector, float Sin, float Cos)
 }
 
 
-void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GenerateSpriteData);
 	FVector ComponentLocation = GetRelativeLocation();
@@ -108,7 +139,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	float ComponentPitchRadians = FMath::DegreesToRadians(ComponentRotation.Pitch);
 
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
-
+	
 	if (!DataSet.IsCurrentDataValid())
 		return;
 	
@@ -118,25 +149,31 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	if (ParticleCount < 1)
 		return;
 
+	
+#if ENGINE_MINOR_VERSION < 1		
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#endif
+			
 
 	const float FakeDepthScaler = 1 / WidgetProperties->FakeDepthScaleDistance;
 
 	FVector2D SubImageSize = SpriteRenderer->SubImageSize;
 	FVector2D SubImageDelta = FVector2D::UnitVector / SubImageSize;
 
-	const auto PositionData = FNiagaraDataSetAccessor<FVector>::		CreateReader(DataSet, SpriteRenderer->PositionBinding.GetDataSetBindableVariable().GetName());
-	const auto ColorData	= FNiagaraDataSetAccessor<FLinearColor>::	CreateReader(DataSet, SpriteRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
-	const auto VelocityData = FNiagaraDataSetAccessor<FVector>::		CreateReader(DataSet, SpriteRenderer->VelocityBinding.GetDataSetBindableVariable().GetName());
-	const auto SizeData		= FNiagaraDataSetAccessor<FVector2D>::		CreateReader(DataSet, SpriteRenderer->SpriteSizeBinding.GetDataSetBindableVariable().GetName());
-	const auto RotationData = FNiagaraDataSetAccessor<float>::			CreateReader(DataSet, SpriteRenderer->SpriteRotationBinding.GetDataSetBindableVariable().GetName());
-	const auto SubImageData = FNiagaraDataSetAccessor<float>::			CreateReader(DataSet, SpriteRenderer->SubImageIndexBinding.GetDataSetBindableVariable().GetName());
-	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4>::CreateReader(DataSet, SpriteRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
+	const auto PositionData = FNiagaraDataSetAccessor<FNiagaraPosition>::	CreateReader(DataSet, SpriteRenderer->PositionBinding.GetDataSetBindableVariable().GetName());
+	const auto ColorData	= FNiagaraDataSetAccessor<FLinearColor>::		CreateReader(DataSet, SpriteRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
+	const auto VelocityData = FNiagaraDataSetAccessor<FVector3f>::			CreateReader(DataSet, SpriteRenderer->VelocityBinding.GetDataSetBindableVariable().GetName());
+	const auto SizeData		= FNiagaraDataSetAccessor<FVector2f>::			CreateReader(DataSet, SpriteRenderer->SpriteSizeBinding.GetDataSetBindableVariable().GetName());
+	const auto RotationData = FNiagaraDataSetAccessor<float>::				CreateReader(DataSet, SpriteRenderer->SpriteRotationBinding.GetDataSetBindableVariable().GetName());
+	const auto SubImageData = FNiagaraDataSetAccessor<float>::				CreateReader(DataSet, SpriteRenderer->SubImageIndexBinding.GetDataSetBindableVariable().GetName());
+	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4f>::	CreateReader(DataSet, SpriteRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
 
 	auto GetParticlePosition2D = [&PositionData](int32 Index)
 	{
-		const FVector Position3D = PositionData.GetSafe(Index, FVector::ZeroVector);
-		return FVector2D(Position3D.X, -Position3D.Z);
+		const FVector3f Position3D = PositionData.GetSafe(Index, FVector3f::ZeroVector);
+		return FVector2f(Position3D.X, -Position3D.Z);
 	};
 	
 	auto GetParticleDepth = [&PositionData](int32 Index)
@@ -151,13 +188,13 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetParticleVelocity2D = [&VelocityData](int32 Index)
 	{
-		const FVector Velocity3D = VelocityData.GetSafe(Index, FVector::ZeroVector);
+		const FVector3f Velocity3D = VelocityData.GetSafe(Index, FVector3f::ZeroVector);
 		return FVector2D(Velocity3D.X, Velocity3D.Z);
 	};
 	
 	auto GetParticleSize = [&SizeData](int32 Index)
 	{
-		return SizeData.GetSafe(Index, FVector2D::UnitVector);
+		return SizeData.GetSafe(Index, FVector2f::UnitVector);
 	};
 	
 	auto GetParticleRotation = [&RotationData](int32 Index)
@@ -172,7 +209,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	auto GetDynamicMaterialData = [&DynamicMaterialData](int32 Index)
 	{
-		return DynamicMaterialData.GetSafe(Index, FVector4(0.f, 0.f, 0.f, 0.f));
+		return DynamicMaterialData.GetSafe(Index, FVector4f(0.f, 0.f, 0.f, 0.f));
 	};
 	
 	FSlateVertex* VertexData;	
@@ -186,21 +223,21 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	for (int ParticleIndex = 0; ParticleIndex < ParticleCount; ++ParticleIndex)
 	{
 
-		FVector2D ParticlePosition = GetParticlePosition2D(ParticleIndex) * ScaleFactor;
-		FVector2D ParticleSize = GetParticleSize(ParticleIndex) * ScaleFactor;
+		FVector2f ParticlePosition = GetParticlePosition2D(ParticleIndex) * ScaleFactor;
+		FVector2f ParticleSize = GetParticleSize(ParticleIndex) * ScaleFactor;
 
 		if (LocalSpace)
 		{
-			ParticlePosition *= FVector2D(ComponentScale.X, ComponentScale.Z);
+			ParticlePosition *= FVector2f(ComponentScale.X, ComponentScale.Z);
 			ParticlePosition  = ParticlePosition.GetRotated(-ComponentRotation.Pitch);
 			ParticlePosition += ParentTopLeft;	
-			ParticlePosition += FVector2D(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
+			ParticlePosition += FVector2f(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
 			
-			ParticleSize *= FVector2D(ComponentScale.X, ComponentScale.Z);
+			ParticleSize *= FVector2f(ComponentScale.X, ComponentScale.Z);
 		}
 		else
 		{
-			ParticlePosition +=  ParentTopLeft;					
+			ParticlePosition += ParentTopLeft;					
 		}
 
 
@@ -211,7 +248,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		}
 
 		
-		const FVector2D ParticleHalfSize = ParticleSize * 0.5;
+		const FVector2f ParticleHalfSize = ParticleSize * 0.5;
 		
 		
 		const FColor ParticleColor = GetParticleColor(ParticleIndex).ToFColor(true);
@@ -274,7 +311,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		}
 
 		
-		const FVector4 MaterialData = GetDynamicMaterialData(ParticleIndex);
+		const FVector4f MaterialData = GetDynamicMaterialData(ParticleIndex);
 
 		FVector2D PositionArray[4];
 		PositionArray[0] = FastRotate(FVector2D(-ParticleHalfSize.X, -ParticleHalfSize.Y), ParticleRotationSin, ParticleRotationCos);
@@ -288,7 +325,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		
 		for (int i = 0; i < 4; ++i)
 		{
-			VertexData[VertexIndex + i].Position = PositionArray[i] + ParticlePosition;
+			VertexData[VertexIndex + i].Position = FVector2f(PositionArray[i]) + ParticlePosition;
 			VertexData[VertexIndex + i].Color = ParticleColor;
 			VertexData[VertexIndex + i].TexCoords[0] = TextureCoordinates[i].X;
 			VertexData[VertexIndex + i].TexCoords[1] = TextureCoordinates[i].Y;
@@ -307,7 +344,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	}
 }
 
-void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2D ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GenerateRibbonData);
 	
@@ -328,7 +365,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 
 	const auto SortKeyReader = RibbonRenderer->SortKeyDataSetAccessor.GetReader(DataSet);
-
+	
 	if (!ensureMsgf(SortKeyReader.IsValid(), TEXT("Invalid Sort Key Reader encrountered while rendering ribbon particles. This can happen if the particle is missing \"Particle State\" module.")))
 		return;
 
@@ -340,8 +377,8 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	auto GetParticlePosition2D = [&PositionData](int32 Index)
 	{
-		const FVector Position3D = PositionData.GetSafe(Index, FVector::ZeroVector);
-		return FVector2D(Position3D.X, -Position3D.Z);
+		const FVector3f Position3D = PositionData.GetSafe(Index, FVector3f::ZeroVector);
+		return FVector2f(Position3D.X, -Position3D.Z);
 	};	
 
 	auto GetParticleColor = [&ColorData](int32 Index)
@@ -354,7 +391,12 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		return RibbonWidthData.GetSafe(Index, 1.f);
 	};
 
-	const bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
+#if ENGINE_MINOR_VERSION < 1		
+	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#endif
+			
 	const bool FullIDs = RibbonFullIDData.IsValid();
 	const bool MultiRibbons = FullIDs;
 
@@ -380,27 +422,27 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 		float TotalDistance = 0.0f;
 
-		FVector2D LastPosition = GetParticlePosition2D(StartDataIndex);
-		FVector2D CurrentPosition = FVector2D::ZeroVector;
+		FVector2f LastPosition = GetParticlePosition2D(StartDataIndex);
+		FVector2f CurrentPosition = FVector2f::ZeroVector;
 		float CurrentWidth = 0.f;
-		FVector2D LastToCurrentVector = FVector2D::ZeroVector;
+		FVector2f LastToCurrentVector = FVector2f::ZeroVector;
 		float LastToCurrentSize = 0.f;
 		float LastU0 = 0.f;
 		float LastU1 = 0.f;
 		
-		FVector2D LastParticleUIPosition = LastPosition * ScaleFactor;
+		FVector2f LastParticleUIPosition = LastPosition * ScaleFactor;
 		
 		if (LocalSpace)
 		{
-			LastParticleUIPosition *= FVector2D(ComponentScale.X, ComponentScale.Z);
+			LastParticleUIPosition *= FVector2f(ComponentScale.X, ComponentScale.Z);
 			LastParticleUIPosition = LastParticleUIPosition.GetRotated(-ComponentRotation.Pitch);
-			LastParticleUIPosition +=  ParentTopLeft;
+			LastParticleUIPosition += ParentTopLeft;
 			
-			LastParticleUIPosition += FVector2D(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
+			LastParticleUIPosition += FVector2f(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
 		}
 		else
 		{
-			LastParticleUIPosition +=  ParentTopLeft;
+			LastParticleUIPosition += ParentTopLeft;
 		}
 		
 		int32 CurrentIndex = 1;
@@ -417,7 +459,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		const FColor InitialColor = GetParticleColor(StartDataIndex).ToFColor(true);
 		const float InitialWidth = GetParticleWidth(StartDataIndex) * ScaleFactor;
 		
-		FVector2D InitialPositionArray[2];
+		FVector2f InitialPositionArray[2];
 		InitialPositionArray[0] = LastToCurrentVector.GetRotated(90.f) * InitialWidth * 0.5f;
 		InitialPositionArray[1] = -InitialPositionArray[0];
 		
@@ -436,8 +478,8 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		while (NextIndex < numParticlesInRibbon)
 		{
 			const int32 NextDataIndex = RibbonIndices[NextIndex];
-			const FVector2D NextPosition = GetParticlePosition2D(NextDataIndex);	
-			FVector2D CurrentToNextVector = NextPosition - CurrentPosition;
+			const FVector2f NextPosition = GetParticlePosition2D(NextDataIndex);	
+			FVector2f CurrentToNextVector = NextPosition - CurrentPosition;
 			const float CurrentToNextSize = CurrentToNextVector.Size();		
 			CurrentWidth = GetParticleWidth(CurrentDataIndex) * ScaleFactor;
 			FColor CurrentColor = GetParticleColor(CurrentDataIndex).ToFColor(true);
@@ -445,26 +487,26 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			// Normalize CurrToNextVec
 			CurrentToNextVector *= 1.f / CurrentToNextSize;
 			
-			const FVector2D CurrentTangent = (LastToCurrentVector + CurrentToNextVector).GetSafeNormal();
+			const FVector2f CurrentTangent = (LastToCurrentVector + CurrentToNextVector).GetSafeNormal();
 			
 			TotalDistance += LastToCurrentSize;
 
-			FVector2D CurrentPositionArray[2];
+			FVector2f CurrentPositionArray[2];
 			CurrentPositionArray[0] = CurrentTangent.GetRotated(90.f) * CurrentWidth * 0.5f;
 			CurrentPositionArray[1] = -CurrentPositionArray[0];
 
-			FVector2D CurrentParticleUIPosition = CurrentPosition * ScaleFactor;
+			FVector2f CurrentParticleUIPosition = CurrentPosition * ScaleFactor;
 
 			if (LocalSpace)
 			{
-				CurrentParticleUIPosition *= FVector2D(ComponentScale.X, ComponentScale.Z);
+				CurrentParticleUIPosition *= FVector2f(ComponentScale.X, ComponentScale.Z);
 				CurrentParticleUIPosition = CurrentParticleUIPosition.GetRotated(-ComponentRotation.Pitch);
-				CurrentParticleUIPosition +=  ParentTopLeft;
-				CurrentParticleUIPosition += FVector2D(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
+				CurrentParticleUIPosition += ParentTopLeft;
+				CurrentParticleUIPosition += FVector2f(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
 			}
 			else
 			{
-				CurrentParticleUIPosition +=  ParentTopLeft;
+				CurrentParticleUIPosition += ParentTopLeft;
 			}
 
 			float CurrentU0 = 0.f;
@@ -489,13 +531,13 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 				CurrentU1 = (float)CurrentIndex / (float)numParticlesInRibbon;
 			}
 
-			FVector2D TextureCoordinates0[2];
-			TextureCoordinates0[0] = FVector2D(CurrentU0, 1.f);
-			TextureCoordinates0[1] = FVector2D(CurrentU0, 0.f);
+			FVector2f TextureCoordinates0[2];
+			TextureCoordinates0[0] = FVector2f(CurrentU0, 1.f);
+			TextureCoordinates0[1] = FVector2f(CurrentU0, 0.f);
 			
-            FVector2D TextureCoordinates1[2];
-			TextureCoordinates1[0] = FVector2D(CurrentU1, 1.f);
-			TextureCoordinates1[1] = FVector2D(CurrentU1, 0.f);
+            FVector2f TextureCoordinates1[2];
+			TextureCoordinates1[0] = FVector2f(CurrentU1, 1.f);
+			TextureCoordinates1[1] = FVector2f(CurrentU1, 0.f);
 			
 			for (int i = 0; i < 2; ++i)
 			{
