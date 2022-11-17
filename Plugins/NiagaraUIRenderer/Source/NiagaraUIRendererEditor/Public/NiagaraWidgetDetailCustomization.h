@@ -21,6 +21,8 @@ private:
 
 	void RegisterPropertyChangedFullRefresh(IDetailLayoutBuilder& DetailBuilder, const FName Property, bool RegisterChildProperty = false);
 
+	void RetryWarningUpdateNextTick();
+
 	void CheckWarnings();
 	
 	void DisplayWarningBox(IDetailLayoutBuilder& DetailBuilder);

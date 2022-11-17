@@ -79,6 +79,20 @@ void FNiagaraWidgetDetailCustomization::RegisterPropertyChangedFullRefresh(IDeta
 	PropertyHandle.Get()->SetOnChildPropertyValueChanged(FSimpleDelegate::CreateSP(this, &FNiagaraWidgetDetailCustomization::ForceRefreshDetailPanel));
 }
 
+void FNiagaraWidgetDetailCustomization::RetryWarningUpdateNextTick()
+{
+	CheckWarnings();
+
+	if (CachedDetailBuilder.IsValid())
+	{
+		if (WarningMessages.Num() > 0)
+		{
+			DisplayWarningBox(*CachedDetailBuilder.Pin());
+			ForceRefreshDetailPanel();
+		}
+	}
+}
+
 void FNiagaraWidgetDetailCustomization::CheckWarnings()
 {
 	if (!CachedNiagaraWidget.IsValid())
@@ -86,16 +100,31 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 
 	UNiagaraUIComponent* NiagaraComponent = CachedNiagaraWidget->GetNiagaraComponent();
 
-	if (!NiagaraComponent || !NiagaraComponent->GetSystemInstance())
+	if (!NiagaraComponent)
 		return;
+
+	if (!NiagaraComponent->GetSystemInstanceController())
+	{
+		GEditor->GetTimerManager()->SetTimerForNextTick([self = SharedThis(this)->AsWeak()]()
+		{
+			if (self.IsValid())
+			{
+				StaticCastSharedPtr<FNiagaraWidgetDetailCustomization>(self.Pin())->RetryWarningUpdateNextTick();
+			}
+		});
+		
+		return;
+	}
 
 	TArray<FString> GPUWarningEmitterNames;
 	TArray<FString> DomainWarningEmitterNames;
 	TArray<FString> DomainWarningRendererNames;
 	TArray<FString> DomainWarningMaterialNames;
 
-	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : NiagaraComponent->GetSystemInstance()->GetEmitters())
+	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
+		
+#if ENGINE_MINOR_VERSION < 1
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			if (Emitter->SimTarget != ENiagaraSimTarget::CPUSim)
@@ -105,6 +134,7 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 			else
 			{
 				TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
+				
 
 				for (UNiagaraRendererProperties* Property : Properties)
 				{
@@ -137,6 +167,49 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 				}
 			}
 		}
+#else
+		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+		
+		if (Emitter.GetEmitterData()->SimTarget != ENiagaraSimTarget::CPUSim)
+		{
+			GPUWarningEmitterNames.Add(Emitter.GetEmitterData()->GetDebugSimName());
+		}
+		else
+		{
+			TArray<UNiagaraRendererProperties*> Properties = Emitter.GetEmitterData()->GetRenderers();
+			
+
+			for (UNiagaraRendererProperties* Property : Properties)
+			{
+				UMaterialInterface* RendererMaterial = nullptr;
+				
+				if (UNiagaraSpriteRendererProperties* SpriteRenderer = Cast<UNiagaraSpriteRendererProperties>(Property))
+				{
+					RendererMaterial = SpriteRenderer->Material;
+				}
+				else if (UNiagaraRibbonRendererProperties* RibbonRenderer = Cast<UNiagaraRibbonRendererProperties>(Property))
+				{
+					RendererMaterial = RibbonRenderer->Material;
+				}
+
+				if (RendererMaterial)
+				{
+					UMaterialInterface* ActualMaterial = CachedNiagaraWidget->MaterialRemapList.Contains(RendererMaterial) && *CachedNiagaraWidget->MaterialRemapList.Find(RendererMaterial) != nullptr
+													   ? *CachedNiagaraWidget->MaterialRemapList.Find(RendererMaterial) : RendererMaterial;
+
+					if (ActualMaterial && ActualMaterial->GetMaterial()->MaterialDomain != EMaterialDomain::MD_UI)
+					{
+						DomainWarningEmitterNames.Add(Emitter.GetEmitterData()->GetDebugSimName());
+						DomainWarningRendererNames.Add(Property->GetName());
+						DomainWarningMaterialNames.Add(ActualMaterial->GetName());
+
+						if (!CachedNiagaraWidget->MaterialRemapList.Contains(RendererMaterial))
+							ShowAutoPopulate = true;
+					}
+				}
+			}
+		}
+#endif
 	}
 
 	if (GPUWarningEmitterNames.Num() > 0)
@@ -180,7 +253,11 @@ void FNiagaraWidgetDetailCustomization::DisplayWarningBox(IDetailLayoutBuilder& 
 		.WholeRowContent()
 		[
 			SNew(SBorder)
+#if ENGINE_MINOR_VERSION < 1
 			.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+#else
+			.BorderImage(FAppStyle::GetBrush("NoBorder"))
+#endif
 			.Padding(FMargin(0.f, 10.f, 15.f, 10.f))
 			[
 				SNew(SVerticalBox)
@@ -296,17 +373,24 @@ void FNiagaraWidgetDetailCustomization::OnAutoPopulatePressed()
 
 	UNiagaraUIComponent* NiagaraComponent = CachedNiagaraWidget->GetNiagaraComponent();
 
-	if (!NiagaraComponent || !NiagaraComponent->GetSystemInstance())
+	if (!NiagaraComponent || !NiagaraComponent->GetSystemInstanceController())
 		return;
 
-	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : NiagaraComponent->GetSystemInstance()->GetEmitters())
+	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
+#if ENGINE_MINOR_VERSION < 1
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			if (Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
 			{
 				TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
-
+#else
+		if (FVersionedNiagaraEmitterData* EmitterData = EmitterInst->GetCachedEmitterData())
+		{
+			if (EmitterData->SimTarget == ENiagaraSimTarget::CPUSim)
+			{
+				TArray<UNiagaraRendererProperties*> Properties = EmitterData->GetRenderers();
+#endif
 				for (UNiagaraRendererProperties* Property : Properties)
 				{
 					UMaterialInterface* RendererMaterial = nullptr;

@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 
+#if ENGINE_MINOR_VERSION < 1
 #include "Classes/EditorStyleSettings.h"
+#endif
+
 #include "Styling/SlateStyle.h"
 
 /**
