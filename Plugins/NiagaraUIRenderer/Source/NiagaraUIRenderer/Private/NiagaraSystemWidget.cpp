@@ -42,6 +42,9 @@ void UNiagaraSystemWidget::ReleaseSlateResources(bool bReleaseChildren)
 
 	if (NiagaraActor)
 		NiagaraActor->Destroy();
+
+	NiagaraActor = nullptr;
+	NiagaraComponent = nullptr;
 }
 
 #if WITH_EDITOR
