@@ -20,6 +20,9 @@ class NIAGARAUIRENDERER_API UNiagaraUIComponent : public UNiagaraComponent
 
 public:
 	void SetAutoActivateParticle(bool AutoActivate);
+
+	void RequestActivateSystem(bool Reset);
+	void RequestDeactivateSystem();
 	
 	void SetTransformationForUIRendering(FVector2D Location, FVector2f Scale, float Angle);
 
@@ -35,5 +38,8 @@ public:
 	
 private:
 	bool AutoActivateParticle = false;
+
+	// Indicates if the position of the transform was ever set based on the UI position
+	bool HasSetTransform = false;
 	
 };

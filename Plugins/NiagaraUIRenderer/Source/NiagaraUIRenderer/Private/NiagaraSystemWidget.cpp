@@ -97,13 +97,13 @@ void UNiagaraSystemWidget::InitializeNiagaraUI()
 void UNiagaraSystemWidget::ActivateSystem(bool Reset)
 {
 	if (NiagaraComponent)
-		NiagaraComponent->Activate(Reset);
+		NiagaraComponent->RequestActivateSystem(Reset);
 }
 
 void UNiagaraSystemWidget::DeactivateSystem()
 {
 	if (NiagaraComponent)
-		NiagaraComponent->Deactivate();
+		NiagaraComponent->RequestDeactivateSystem();
 }
 
 UNiagaraUIComponent* UNiagaraSystemWidget::GetNiagaraComponent()

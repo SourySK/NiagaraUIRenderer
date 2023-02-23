@@ -19,6 +19,25 @@ void UNiagaraUIComponent::SetAutoActivateParticle(bool AutoActivate)
 	AutoActivateParticle = AutoActivate;
 }
 
+void UNiagaraUIComponent::RequestActivateSystem(bool Reset)
+{
+	// If we already have a valid transform activate us right now
+	if (HasSetTransform)
+	{
+		Activate(Reset);
+		return;
+	}
+
+	// If not, wait until we get one
+	SetAutoActivateParticle(true);
+}
+
+void UNiagaraUIComponent::RequestDeactivateSystem()
+{
+	Deactivate();
+	SetAutoActivateParticle(false);
+}
+
 void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FVector2f Scale, float Angle)
 {
 	const FVector NewLocation(Location.X, 0.f, -Location.Y);
@@ -34,6 +53,8 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 
 		AutoActivateParticle = false;
 	}
+
+	HasSetTransform = true;
 }
 
 #if ENGINE_MINOR_VERSION < 1
