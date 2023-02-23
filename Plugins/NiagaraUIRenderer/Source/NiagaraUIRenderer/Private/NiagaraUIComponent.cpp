@@ -70,6 +70,9 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 
 	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
+		if (EmitterInst->IsDisabled())
+			continue;
+			
 #if ENGINE_MINOR_VERSION < 1
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
@@ -82,9 +85,6 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 			}
 		}
 #else
-		if (EmitterInst->IsDisabled())
-			continue;
-		
 		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
 
 		if (Emitter.Emitter)
