@@ -82,14 +82,20 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 			}
 		}
 #else
+		if (EmitterInst->IsDisabled())
+			continue;
+		
 		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
 
-		TArray<UNiagaraRendererProperties*> Properties = Emitter.GetEmitterData()->GetRenderers();
-
-		for (UNiagaraRendererProperties* Property : Properties)
+		if (Emitter.Emitter)
 		{
-			FNiagaraRendererEntry NewEntry(Property, EmitterInst, Emitter);
-			Renderers.Add(NewEntry);
+			TArray<UNiagaraRendererProperties*> Properties = Emitter.GetEmitterData()->GetRenderers();
+
+			for (UNiagaraRendererProperties* Property : Properties)
+			{
+				FNiagaraRendererEntry NewEntry(Property, EmitterInst, Emitter);
+				Renderers.Add(NewEntry);
+			}
 		}
 #endif
 	}
