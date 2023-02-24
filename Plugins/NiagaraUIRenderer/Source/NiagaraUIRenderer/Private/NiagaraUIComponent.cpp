@@ -1,4 +1,4 @@
-// Copyright 2022 - Michal Smoleň
+// Copyright 2023 - Michal Smoleň
 
 #include "NiagaraUIComponent.h"
 #include "Stats/Stats.h"

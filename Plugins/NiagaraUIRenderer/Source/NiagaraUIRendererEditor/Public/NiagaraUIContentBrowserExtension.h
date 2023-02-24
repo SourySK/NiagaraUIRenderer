@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Michal Smoleň 
+// Copyright 2023 Michal Smoleň 
 
 #pragma once
 
