@@ -5,9 +5,11 @@
 #include "DetailCategoryBuilder.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
+#include "MaterialDomain.h"
 #include "NiagaraRibbonRendererProperties.h"
 #include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystem.h"
+#include "NiagaraSystemInstanceController.h"
 #include "NiagaraSystemWidget.h"
 #include "NiagaraUIComponent.h"
 #include "NiagaraUIRendererEditorStyle.h"
@@ -376,7 +378,7 @@ void FNiagaraWidgetDetailCustomization::OnAutoPopulatePressed()
 	if (!NiagaraComponent || !NiagaraComponent->GetSystemInstanceController())
 		return;
 
-	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
+	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
 #if ENGINE_MINOR_VERSION < 1
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())

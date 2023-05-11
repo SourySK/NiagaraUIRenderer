@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.1.6",
-	"EngineVersion" : "5.1.0",
+	"EngineVersion" : "5.2.0",
 	"FriendlyName": "Niagara UI Renderer",
 	"Description": "Add support for Niagara particle systems to be rendered directly as UI Widgets",
 	"Category": "FX",

@@ -5,6 +5,7 @@
 #include "Materials/MaterialInterface.h"
 #include "NiagaraUIActor.h"
 #include "NiagaraUIComponent.h"
+#include "Engine/World.h"
 
 UNiagaraSystemWidget::UNiagaraSystemWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

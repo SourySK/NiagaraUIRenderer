@@ -83,7 +83,7 @@ TSharedPtr<FSlateMaterialBrush> SNiagaraUISystemWidget::CreateSlateMaterialBrush
         }
     }
     
-    const auto MaterialInstanceDynamic = UMaterialInstanceDynamic::Create(MaterialToUse, GetTransientPackage());
+    const auto MaterialInstanceDynamic = UMaterialInstanceDynamic::Create(MaterialToUse, nullptr);
     MaterialInstanceDynamic->AddToRoot();
     
     TSharedPtr<FSlateMaterialBrush> NewElement = MakeShareable(new FSlateMaterialBrush(*MaterialInstanceDynamic, FVector2D(1.f, 1.f)));

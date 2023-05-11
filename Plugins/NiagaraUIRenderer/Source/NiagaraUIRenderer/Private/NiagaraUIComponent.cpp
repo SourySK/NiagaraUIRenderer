@@ -5,6 +5,7 @@
 #include "NiagaraRenderer.h"
 #include "NiagaraRibbonRendererProperties.h"
 #include "NiagaraSpriteRendererProperties.h"
+#include "NiagaraSystemInstanceController.h"
 #include "SNiagaraUISystemWidget.h"
 
 
@@ -60,19 +61,19 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 #if ENGINE_MINOR_VERSION < 1
 struct FNiagaraRendererEntry
 {
-	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstIn, UNiagaraEmitter* EmitterIn)
+	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance> EmitterInstIn, UNiagaraEmitter* EmitterIn)
 		: RendererProperties(PropertiesIn), EmitterInstance(EmitterInstIn), Emitter(EmitterIn) {}
 	UNiagaraRendererProperties* RendererProperties;
-	TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstance;
+	TSharedRef<const FNiagaraEmitterInstance> EmitterInstance;
 	UNiagaraEmitter* Emitter;
 };
 #else
 struct FNiagaraRendererEntry
 {
-	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstIn, FVersionedNiagaraEmitter EmitterIn)
+	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance> EmitterInstIn, FVersionedNiagaraEmitter EmitterIn)
 		: RendererProperties(PropertiesIn), EmitterInstance(EmitterInstIn), Emitter(EmitterIn) {}
 	UNiagaraRendererProperties* RendererProperties;
-	TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInstance;
+	TSharedRef<const FNiagaraEmitterInstance> EmitterInstance;
 	FVersionedNiagaraEmitter Emitter;
 };
 #endif
@@ -89,7 +90,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 	
 	TArray<FNiagaraRendererEntry> Renderers;
 
-	for(TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst : GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
+	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
 		if (EmitterInst->IsDisabled())
 			continue;
@@ -157,7 +158,7 @@ FORCEINLINE FVector2D FastRotate(const FVector2D Vector, float Sin, float Cos)
 }
 
 
-void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GenerateSpriteData);
 	FVector ComponentLocation = GetRelativeLocation();
@@ -371,7 +372,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	}
 }
 
-void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance, ESPMode::ThreadSafe> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	SCOPE_CYCLE_COUNTER(STAT_GenerateRibbonData);
 	
