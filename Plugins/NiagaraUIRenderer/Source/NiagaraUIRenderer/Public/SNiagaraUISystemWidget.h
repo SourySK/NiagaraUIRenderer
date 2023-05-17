@@ -25,6 +25,7 @@ public:
 	~SNiagaraUISystemWidget();
 
 	virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
+	virtual FVector2D ComputeDesiredSize(float LayoutScaleMultiplier) const override;
 
 	void AddRenderData(FSlateVertex** OutVertexData, SlateIndex** OutIndexData, UMaterialInterface* Material, int32 NumVertexData, int32 NumIndexData);
 	
@@ -36,10 +37,14 @@ public:
 
 	void SetNiagaraComponentReference(TWeakObjectPtr<UNiagaraUIComponent> NiagaraComponentIn, FNiagaraWidgetProperties Properties);
 
+	void SetDesiredSize(FVector2D NewDesiredSize);
+
 private:
 	TWeakObjectPtr<UNiagaraUIComponent> NiagaraComponent;
 
 	static TMap<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>> MaterialBrushMap;
 
 	FNiagaraWidgetProperties WidgetProperties = FNiagaraWidgetProperties(nullptr, true, false, false, 1.f);
+
+	FVector2D DesiredSize = FVector2D(256., 256.);
 };

@@ -1,6 +1,8 @@
 // Copyright 2023 - Michal Smoleň
 
 #include "NiagaraSystemWidget.h"
+
+#include "NiagaraSystem.h"
 #include "SNiagaraUISystemWidget.h"
 #include "Materials/MaterialInterface.h"
 #include "NiagaraUIActor.h"
@@ -64,7 +66,8 @@ void UNiagaraSystemWidget::PostEditChangeProperty(FPropertyChangedEvent& Propert
 			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, MaterialRemapList)
 			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, AutoActivate)
 			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, FakeDepthScale)
-			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, FakeDepthScaleDistance))
+			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, FakeDepthScaleDistance)
+			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, DesiredWidgetSize))
 		{
 			InitializeNiagaraUI();
 		}
@@ -92,6 +95,7 @@ void UNiagaraSystemWidget::InitializeNiagaraUI()
 		NiagaraComponent = NiagaraActor->SpawnNewNiagaraUIComponent(NiagaraSystemReference, AutoActivate, ShowDebugSystemInWorld, TickWhenPaused);
 
 		NiagaraSlateWidget->SetNiagaraComponentReference(NiagaraComponent, FNiagaraWidgetProperties(&MaterialRemapList, AutoActivate, ShowDebugSystemInWorld, FakeDepthScale, FakeDepthScaleDistance));
+		NiagaraSlateWidget->SetDesiredSize(DesiredWidgetSize);
 	}
 }
 
@@ -132,5 +136,15 @@ void UNiagaraSystemWidget::UpdateTickWhenPaused(bool NewTickWhenPaused)
 		NiagaraComponent->SetTickableWhenPaused(NewTickWhenPaused);
 		NiagaraComponent->SetForceSolo(NewTickWhenPaused);
 		NiagaraComponent->ResetSystem();
+	}
+}
+
+void UNiagaraSystemWidget::SetDesiredWidgetSize(FVector2D NewDesiredSize)
+{
+	DesiredWidgetSize = NewDesiredSize;
+
+	if (NiagaraSlateWidget.IsValid())
+	{
+		NiagaraSlateWidget->SetDesiredSize(DesiredWidgetSize);
 	}
 }

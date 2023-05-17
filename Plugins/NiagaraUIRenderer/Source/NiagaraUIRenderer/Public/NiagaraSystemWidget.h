@@ -57,6 +57,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	void UpdateTickWhenPaused(bool NewTickWhenPaused);
 
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	void SetDesiredWidgetSize(FVector2D NewDesiredSize);
+
 public:
 	// Reference to the niagara system asset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", DisplayName = "Niagara System", BlueprintSetter = UpdateNiagaraSystemReference)
@@ -82,6 +85,10 @@ public:
 	// Should be this particle system updated even when the game is paused?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", BlueprintSetter = UpdateTickWhenPaused)
 	bool TickWhenPaused = false;
+
+	// The size of this particle widget used when calculating it's desired size
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", meta = (ClampMin = 0.f, UIMax = 4096.f))
+	FVector2D DesiredWidgetSize = FVector2D(256., 256.);
 
 	// Scale particles based on their position in Y-axis (towards the camera)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)

@@ -43,6 +43,11 @@ int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& A
     return SMeshWidget::OnPaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
 }
 
+FVector2D SNiagaraUISystemWidget::ComputeDesiredSize(float LayoutScaleMultiplier) const
+{
+    return DesiredSize;
+}
+
 void SNiagaraUISystemWidget::AddRenderData(FSlateVertex** OutVertexData, SlateIndex** OutIndexData, UMaterialInterface* Material, int32 NumVertexData, int32 NumIndexData)
 {
     if (NumVertexData < 1 || NumIndexData < 1)
@@ -118,4 +123,9 @@ void SNiagaraUISystemWidget::SetNiagaraComponentReference(TWeakObjectPtr<UNiagar
     WidgetProperties = Properties;
 
     NiagaraComponent = NiagaraComponentIn;
+}
+
+void SNiagaraUISystemWidget::SetDesiredSize(FVector2D NewDesiredSize)
+{
+    DesiredSize = NewDesiredSize;
 }
