@@ -430,8 +430,8 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	auto AddRibbonVerts = [&](TArray<int32>& RibbonIndices)
 	{
-		const int32 numParticlesInRibbon = RibbonIndices.Num();
-		if (numParticlesInRibbon < 3)
+		const int32 NumParticlesInRibbon = RibbonIndices.Num();
+		if (NumParticlesInRibbon < 2)
 			return;
 		
 		FSlateVertex* VertexData;	
@@ -440,7 +440,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		FSlateBrush Brush;
 		UMaterialInterface* SpriteMaterial = RibbonRenderer->Material;
 		
-		NiagaraWidget->AddRenderData(&VertexData, &IndexData, SpriteMaterial, (numParticlesInRibbon - 1) * 2, (numParticlesInRibbon - 2) * 6);
+		NiagaraWidget->AddRenderData(&VertexData, &IndexData, SpriteMaterial, (NumParticlesInRibbon) * 2, (NumParticlesInRibbon - 1) * 6);
 
 		int32 CurrentVertexIndex = 0;
 		int32 CurrentIndexIndex = 0;
@@ -495,19 +495,22 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		{
 			VertexData[CurrentVertexIndex + i].Position = InitialPositionArray[i] +  LastParticleUIPosition;
 			VertexData[CurrentVertexIndex + i].Color = InitialColor;
-			VertexData[CurrentVertexIndex + i].TexCoords[0] = i;
-			VertexData[CurrentVertexIndex + i].TexCoords[1] = 0;
+			VertexData[CurrentVertexIndex + i].TexCoords[0] = 0;
+			VertexData[CurrentVertexIndex + i].TexCoords[1] = 1 - i;
 		}
 
 		CurrentVertexIndex += 2;
 
 		int32 NextIndex = CurrentIndex + 1;
 		
-		while (NextIndex < numParticlesInRibbon)
+		while (NextIndex <= NumParticlesInRibbon)
 		{
-			const int32 NextDataIndex = RibbonIndices[NextIndex];
-			const FVector2f NextPosition = GetParticlePosition2D(NextDataIndex);	
-			FVector2f CurrentToNextVector = NextPosition - CurrentPosition;
+			const bool IsLastParticle = NextIndex == NumParticlesInRibbon;
+			
+			const int32 NextDataIndex = IsLastParticle ? -1 : RibbonIndices[NextIndex];
+			const FVector2f NextPosition = IsLastParticle ? FVector2f::ZeroVector : GetParticlePosition2D(NextDataIndex);	
+			FVector2f CurrentToNextVector = IsLastParticle ? LastToCurrentVector : NextPosition - CurrentPosition;
+			
 			const float CurrentToNextSize = CurrentToNextVector.Size();		
 			CurrentWidth = GetParticleWidth(CurrentDataIndex) * ScaleFactor;
 			FColor CurrentColor = GetParticleColor(CurrentDataIndex).ToFColor(true);
@@ -545,7 +548,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			}
 			else
 			{
-				CurrentU0 = (float)CurrentIndex / (float)numParticlesInRibbon;
+				CurrentU0 = (float)CurrentIndex / ((float)NumParticlesInRibbon - 1.f);
 			}
 			
 			float CurrentU1 = 0.f;
@@ -556,7 +559,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			}
 			else
 			{
-				CurrentU1 = (float)CurrentIndex / (float)numParticlesInRibbon;
+				CurrentU1 = (float)CurrentIndex / ((float)NumParticlesInRibbon - 1.f);
 			}
 
 			FVector2f TextureCoordinates0[2];
@@ -597,6 +600,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			LastToCurrentVector = CurrentToNextVector;
 			LastToCurrentSize = CurrentToNextSize;
 			LastU0 = CurrentU0;
+			LastU1 = CurrentU1;
 
 			++NextIndex;
 		}
