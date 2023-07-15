@@ -5,7 +5,6 @@
 #include "DetailCategoryBuilder.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
-#include "MaterialDomain.h"
 #include "NiagaraRibbonRendererProperties.h"
 #include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystem.h"
@@ -14,6 +13,10 @@
 #include "NiagaraUIComponent.h"
 #include "NiagaraUIRendererEditorStyle.h"
 #include "Widgets/Text/SMultiLineEditableText.h"
+
+#if ENGINE_MINOR_VERSION >= 2
+#include "MaterialDomain.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "NiagaraWidgetDetailCustomization"
 

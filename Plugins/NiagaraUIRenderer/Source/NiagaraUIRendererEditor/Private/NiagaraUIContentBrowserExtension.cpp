@@ -11,8 +11,10 @@
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionParticleColor.h"
 #include "IContentBrowserSingleton.h"
-#include "MaterialDomain.h"
 
+#if ENGINE_MINOR_VERSION >= 2
+#include "MaterialDomain.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "NiagaraUIRenderer"
 
