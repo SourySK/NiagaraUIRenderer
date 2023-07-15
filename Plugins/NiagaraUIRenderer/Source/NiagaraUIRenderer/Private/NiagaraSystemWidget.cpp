@@ -148,3 +148,21 @@ void UNiagaraSystemWidget::SetDesiredWidgetSize(FVector2D NewDesiredSize)
 		NiagaraSlateWidget->SetDesiredSize(DesiredWidgetSize);
 	}
 }
+
+void UNiagaraSystemWidget::SetRemapMaterial(UMaterialInterface* OriginalMaterial, UMaterialInterface* RemapMaterial)
+{
+	if (OriginalMaterial && RemapMaterial)
+	{
+		MaterialRemapList.Emplace(OriginalMaterial, RemapMaterial);
+	}
+}
+
+UMaterialInterface* UNiagaraSystemWidget::GetRemapMaterial(UMaterialInterface* OriginalMaterial)
+{
+	if (UMaterialInterface** FoundMaterial = MaterialRemapList.Find(OriginalMaterial))
+	{
+		return *FoundMaterial;
+	}
+
+	return nullptr;
+}

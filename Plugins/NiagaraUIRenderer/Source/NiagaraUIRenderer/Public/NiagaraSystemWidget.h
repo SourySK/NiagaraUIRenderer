@@ -57,8 +57,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	void UpdateTickWhenPaused(bool NewTickWhenPaused);
 
+	// Updates the desired widget size. If calling from code call this instead of setting the DesiredWidgetSize directly.
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	void SetDesiredWidgetSize(FVector2D NewDesiredSize);
+	
+	/** 
+	 *	Sets / Updates a remap material for a source particle material
+	 *	@param	OriginalMaterial	Source material specified in the Niagara Emitter that should be remapped to a new one
+	 *	@param	RemapMaterial		A new remap material that should be used when rendering UI
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	void SetRemapMaterial(UMaterialInterface* OriginalMaterial, UMaterialInterface* RemapMaterial);
+	
+	// Returns a remap material for a given original particle material specified in the Niagara Emitter 
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	UMaterialInterface* GetRemapMaterial(UMaterialInterface* OriginalMaterial);
 
 public:
 	// Reference to the niagara system asset
@@ -86,7 +99,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", BlueprintSetter = UpdateTickWhenPaused)
 	bool TickWhenPaused = false;
 
-	// The size of this particle widget used when calculating it's desired size
+	// The size of this particle widget used when calculating it's desired size. Don't set directly from code, call SetDesiredWidgetSize instead.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", meta = (ClampMin = 0.f, UIMax = 4096.f))
 	FVector2D DesiredWidgetSize = FVector2D(256., 256.);
 
