@@ -88,10 +88,7 @@ TSharedPtr<FSlateMaterialBrush> SNiagaraUISystemWidget::CreateSlateMaterialBrush
         }
     }
     
-    const auto MaterialInstanceDynamic = UMaterialInstanceDynamic::Create(MaterialToUse, nullptr);
-    MaterialInstanceDynamic->AddToRoot();
-    
-    TSharedPtr<FSlateMaterialBrush> NewElement = MakeShareable(new FSlateMaterialBrush(*MaterialInstanceDynamic, FVector2D(1.f, 1.f)));
+    TSharedPtr<FSlateMaterialBrush> NewElement = MakeShareable(new FSlateMaterialBrush(*MaterialToUse, FVector2D(1.f, 1.f)));
 
     MaterialBrushMap.Add(MaterialToUse, NewElement);
     return NewElement;
@@ -104,7 +101,6 @@ void SNiagaraUISystemWidget::CheckForInvalidBrushes()
     {
         if (Brush.Value.GetSharedReferenceCount() <= 1)
         {
-            Brush.Value->GetResourceObject()->RemoveFromRoot();
             RemoveMaterials.Add(Brush.Key);
         }
     }
@@ -128,4 +124,24 @@ void SNiagaraUISystemWidget::SetNiagaraComponentReference(TWeakObjectPtr<UNiagar
 void SNiagaraUISystemWidget::SetDesiredSize(FVector2D NewDesiredSize)
 {
     DesiredSize = NewDesiredSize;
+}
+
+void SNiagaraUISystemWidget::AddReferencedObjects(FReferenceCollector& Collector)
+{
+    SMeshWidget::AddReferencedObjects(Collector);
+
+    for (TTuple<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>>& element : MaterialBrushMap)
+    {
+        Collector.AddReferencedObject(element.Key);
+
+        if (element.Value.IsValid())
+        {
+            element.Value->AddReferencedObjects(Collector);
+        }
+    }
+}
+
+FString SNiagaraUISystemWidget::GetReferencerName() const
+{
+    return TEXT("SNiagaraUISystemWidget");
 }

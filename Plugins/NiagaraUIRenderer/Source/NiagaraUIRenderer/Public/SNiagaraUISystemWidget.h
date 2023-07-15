@@ -39,6 +39,11 @@ public:
 
 	void SetDesiredSize(FVector2D NewDesiredSize);
 
+	//~ Begin FGCObject Interface
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+	virtual FString GetReferencerName() const override;
+	//~ End FGCObject Interface
+
 private:
 	TWeakObjectPtr<UNiagaraUIComponent> NiagaraComponent;
 
