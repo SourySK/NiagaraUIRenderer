@@ -428,6 +428,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	const auto PositionData		= RibbonRenderer->PositionDataSetAccessor.GetReader(DataSet);
 	const auto ColorData		= FNiagaraDataSetAccessor<FLinearColor>::CreateReader(DataSet, RibbonRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
 	const auto RibbonWidthData	= RibbonRenderer->SizeDataSetAccessor.GetReader(DataSet);
+	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4f>::CreateReader(DataSet, RibbonRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
 	
 	const auto RibbonFullIDData = RibbonRenderer->RibbonFullIDDataSetAccessor.GetReader(DataSet);
 
@@ -445,6 +446,11 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	auto GetParticleWidth = [&RibbonWidthData](int32 Index)
 	{
 		return RibbonWidthData.GetSafe(Index, 1.f);
+	};
+	
+	auto GetDynamicMaterialData = [&DynamicMaterialData](int32 Index)
+	{
+		return DynamicMaterialData.GetSafe(Index, FVector4f(0.f, 0.f, 0.f, 0.f));
 	};
 
 #if ENGINE_MINOR_VERSION < 1		
@@ -578,25 +584,39 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			{
 				CurrentU0 = (float)CurrentIndex / ((float)NumParticlesInRibbon - 1.f);
 			}
-			
-			float CurrentU1 = 0.f;
-		
-			if (RibbonRenderer->UV1Settings.DistributionMode == ENiagaraRibbonUVDistributionMode::TiledOverRibbonLength)
-			{
-				CurrentU1 = LastU1 + LastToCurrentSize / RibbonRenderer->UV1Settings.TilingLength;
-			}
-			else
-			{
-				CurrentU1 = (float)CurrentIndex / ((float)NumParticlesInRibbon - 1.f);
-			}
 
 			FVector2f TextureCoordinates0[2];
 			TextureCoordinates0[0] = FVector2f(CurrentU0, 1.f);
 			TextureCoordinates0[1] = FVector2f(CurrentU0, 0.f);
 			
+			
             FVector2f TextureCoordinates1[2];
-			TextureCoordinates1[0] = FVector2f(CurrentU1, 1.f);
-			TextureCoordinates1[1] = FVector2f(CurrentU1, 0.f);
+
+			if (WidgetProperties->PassDynamicParametersFromRibbon)
+			{
+				const FVector4f MaterialData = GetDynamicMaterialData(CurrentIndex);
+				
+				TextureCoordinates1[0] = FVector2f(MaterialData.X, MaterialData.Y);
+				TextureCoordinates1[1] = FVector2f(MaterialData.X, MaterialData.Y);
+			}
+			else
+			{
+				float CurrentU1 = 0.f;
+				
+				if (RibbonRenderer->UV1Settings.DistributionMode == ENiagaraRibbonUVDistributionMode::TiledOverRibbonLength)
+				{
+					CurrentU1 = LastU1 + LastToCurrentSize / RibbonRenderer->UV1Settings.TilingLength;
+				}
+				else
+				{
+					CurrentU1 = (float)CurrentIndex / ((float)NumParticlesInRibbon - 1.f);
+				}
+			
+				TextureCoordinates1[0] = FVector2f(CurrentU1, 1.f);
+				TextureCoordinates1[1] = FVector2f(CurrentU1, 0.f);
+				
+				LastU1 = CurrentU1;
+			}
 			
 			for (int i = 0; i < 2; ++i)
 			{
@@ -628,7 +648,6 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			LastToCurrentVector = CurrentToNextVector;
 			LastToCurrentSize = CurrentToNextSize;
 			LastU0 = CurrentU0;
-			LastU1 = CurrentU1;
 
 			++NextIndex;
 		}

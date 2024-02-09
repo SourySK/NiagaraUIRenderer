@@ -49,7 +49,7 @@ private:
 
 	static TMap<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>> MaterialBrushMap;
 
-	FNiagaraWidgetProperties WidgetProperties = FNiagaraWidgetProperties(nullptr, true, false, false, 1.f);
+	FNiagaraWidgetProperties WidgetProperties = FNiagaraWidgetProperties(nullptr, true, false, false, false, 1.f);
 
 	FVector2D DesiredSize = FVector2D(256., 256.);
 };

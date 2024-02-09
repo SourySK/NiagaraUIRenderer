@@ -115,6 +115,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
 	bool ShowDebugSystemInWorld = false;
 
+	// Should the dynamic parameters R and G channels be passed as UV1 coordinates from ribbon renderers? This replaces the generated UV1 coordinates, which on the use case might be worth the tradeoff.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
+	bool PassDynamicParametersFromRibbon = false;
+
 	// Disable warnings for this Widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
 	bool DisableWarnings = false;
