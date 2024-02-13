@@ -60,7 +60,8 @@ void UNiagaraSystemWidget::PostEditChangeProperty(FPropertyChangedEvent& Propert
 			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, MaterialRemapList)
 			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, AutoActivate)
 			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, FakeDepthScale)
-			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, FakeDepthScaleDistance))
+			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, FakeDepthScaleDistance)
+			|| PropertyName == GET_MEMBER_NAME_CHECKED(UNiagaraSystemWidget, PassDynamicParametersFromRibbon))
 		{
 			InitializeNiagaraUI();
 		}
@@ -87,7 +88,7 @@ void UNiagaraSystemWidget::InitializeNiagaraUI()
 
 		NiagaraComponent = NiagaraActor->SpawnNewNiagaraUIComponent(NiagaraSystemReference, AutoActivate, ShowDebugSystemInWorld, TickWhenPaused);
 
-		NiagaraSlateWidget->SetNiagaraComponentReference(NiagaraComponent, FNiagaraWidgetProperties(&MaterialRemapList, AutoActivate, ShowDebugSystemInWorld, FakeDepthScale, FakeDepthScaleDistance));
+		NiagaraSlateWidget->SetNiagaraComponentReference(NiagaraComponent, FNiagaraWidgetProperties(&MaterialRemapList, AutoActivate, ShowDebugSystemInWorld, PassDynamicParametersFromRibbon, FakeDepthScale, FakeDepthScaleDistance));
 	}
 }
 

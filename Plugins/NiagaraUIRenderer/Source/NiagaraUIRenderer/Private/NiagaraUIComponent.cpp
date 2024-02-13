@@ -335,6 +335,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	const auto PositionData		= RibbonRenderer->PositionDataSetAccessor.GetReader(DataSet);
 	const auto ColorData		= FNiagaraDataSetAccessor<FLinearColor>::CreateReader(DataSet, RibbonRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
 	const auto RibbonWidthData	= RibbonRenderer->SizeDataSetAccessor.GetReader(DataSet);
+	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4>::CreateReader(DataSet, RibbonRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
 	
 	const auto RibbonFullIDData = RibbonRenderer->RibbonFullIDDataSetAccessor.GetReader(DataSet);
 
@@ -353,6 +354,11 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	{
 		return RibbonWidthData.GetSafe(Index, 1.f);
 	};
+	
+	auto GetDynamicMaterialData = [&DynamicMaterialData](int32 Index)
+	{
+		return DynamicMaterialData.GetSafe(Index, FVector4(0.f, 0.f, 0.f, 0.f));
+	};
 
 	const bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
 	const bool FullIDs = RibbonFullIDData.IsValid();
@@ -360,8 +366,8 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	auto AddRibbonVerts = [&](TArray<int32>& RibbonIndices)
 	{
-		const int32 numParticlesInRibbon = RibbonIndices.Num();
-		if (numParticlesInRibbon < 3)
+		const int32 NumParticlesInRibbon = RibbonIndices.Num();
+		if (NumParticlesInRibbon < 3)
 			return;
 		
 		FSlateVertex* VertexData;	
@@ -370,7 +376,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		FSlateBrush Brush;
 		UMaterialInterface* SpriteMaterial = RibbonRenderer->Material;
 		
-		NiagaraWidget->AddRenderData(&VertexData, &IndexData, SpriteMaterial, (numParticlesInRibbon - 1) * 2, (numParticlesInRibbon - 2) * 6);
+		NiagaraWidget->AddRenderData(&VertexData, &IndexData, SpriteMaterial, (NumParticlesInRibbon - 1) * 2, (NumParticlesInRibbon - 2) * 6);
 
 		int32 CurrentVertexIndex = 0;
 		int32 CurrentIndexIndex = 0;
@@ -433,7 +439,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 		int32 NextIndex = CurrentIndex + 1;
 		
-		while (NextIndex < numParticlesInRibbon)
+		while (NextIndex < NumParticlesInRibbon)
 		{
 			const int32 NextDataIndex = RibbonIndices[NextIndex];
 			const FVector2D NextPosition = GetParticlePosition2D(NextDataIndex);	
@@ -475,18 +481,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			}
 			else
 			{
-				CurrentU0 = (float)CurrentIndex / (float)numParticlesInRibbon;
-			}
-			
-			float CurrentU1 = 0.f;
-		
-			if (RibbonRenderer->UV1Settings.DistributionMode == ENiagaraRibbonUVDistributionMode::TiledOverRibbonLength)
-			{
-				CurrentU1 = LastU1 + LastToCurrentSize / RibbonRenderer->UV1Settings.TilingLength;
-			}
-			else
-			{
-				CurrentU1 = (float)CurrentIndex / (float)numParticlesInRibbon;
+				CurrentU0 = (float)CurrentIndex / (float)NumParticlesInRibbon;
 			}
 
 			FVector2D TextureCoordinates0[2];
@@ -494,8 +489,31 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			TextureCoordinates0[1] = FVector2D(CurrentU0, 0.f);
 			
             FVector2D TextureCoordinates1[2];
-			TextureCoordinates1[0] = FVector2D(CurrentU1, 1.f);
-			TextureCoordinates1[1] = FVector2D(CurrentU1, 0.f);
+			if (WidgetProperties->PassDynamicParametersFromRibbon)
+			{
+				const FVector4 MaterialData = GetDynamicMaterialData(CurrentIndex);
+
+				TextureCoordinates1[0] = FVector2D(MaterialData.X, MaterialData.Y);
+				TextureCoordinates1[1] = FVector2D(MaterialData.X, MaterialData.Y);
+			}
+			else
+			{
+				float CurrentU1 = 0.f;
+
+				if (RibbonRenderer->UV1Settings.DistributionMode == ENiagaraRibbonUVDistributionMode::TiledOverRibbonLength)
+				{
+					CurrentU1 = LastU1 + LastToCurrentSize / RibbonRenderer->UV1Settings.TilingLength;
+				}
+				else
+				{
+					CurrentU1 = (float)CurrentIndex / ((float)NumParticlesInRibbon - 1.f);
+				}
+
+				TextureCoordinates1[0] = FVector2D(CurrentU1, 1.f);
+				TextureCoordinates1[1] = FVector2D(CurrentU1, 0.f);
+
+				LastU1 = CurrentU1;
+			}
 			
 			for (int i = 0; i < 2; ++i)
 			{
