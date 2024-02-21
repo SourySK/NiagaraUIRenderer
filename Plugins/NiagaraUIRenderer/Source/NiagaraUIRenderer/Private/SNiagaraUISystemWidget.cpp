@@ -20,6 +20,8 @@ SNiagaraUISystemWidget::~SNiagaraUISystemWidget()
 
 int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
+    TRACE_CPUPROFILER_EVENT_SCOPE(SNiagaraUISystemWidget::OnPaint);
+
     if (!NiagaraComponent.IsValid())
         return LayerId;
 
