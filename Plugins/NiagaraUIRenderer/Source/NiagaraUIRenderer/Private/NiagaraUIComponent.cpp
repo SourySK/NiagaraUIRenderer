@@ -6,6 +6,7 @@
 #include "NiagaraRibbonRendererProperties.h"
 #include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystemInstanceController.h"
+#include "NiagaraUIRendererVersionUtil.h"
 #include "SNiagaraUISystemWidget.h"
 
 
@@ -58,7 +59,7 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	HasSetTransform = true;
 }
 
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 struct FNiagaraRendererEntry
 {
 	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance> EmitterInstIn, UNiagaraEmitter* EmitterIn)
@@ -95,7 +96,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 		if (EmitterInst->IsDisabled())
 			continue;
 			
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
@@ -126,7 +127,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 			
 	for (FNiagaraRendererEntry Renderer : Renderers)
 	{
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 		if (Renderer.RendererProperties && Renderer.RendererProperties->GetIsEnabled() && Renderer.RendererProperties->IsSimTargetSupported(Renderer.Emitter->SimTarget))
 		{
 			if (Renderer.Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
@@ -178,7 +179,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		return;
 
 	
-#if ENGINE_MINOR_VERSION < 1		
+#if UE_5_0_OR_EARLIER
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
 #else
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
@@ -391,7 +392,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	if (ParticleCount < 2)
 		return;
 	
-#if ENGINE_MINOR_VERSION < 3
+#if UE_5_2_OR_EARLIER
 	const auto SortKeyReader = RibbonRenderer->SortKeyDataSetAccessor.GetReader(DataSet);
 
 	if (!ensureMsgf(SortKeyReader.IsValid(), TEXT("Invalid Sort Key Reader encrountered while rendering ribbon particles. This can happen if the particle is missing \"Particle State\" module.")))
@@ -453,7 +454,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		return DynamicMaterialData.GetSafe(Index, FVector4f(0.f, 0.f, 0.f, 0.f));
 	};
 
-#if ENGINE_MINOR_VERSION < 1		
+#if UE_5_0_OR_EARLIER
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
 #else
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
