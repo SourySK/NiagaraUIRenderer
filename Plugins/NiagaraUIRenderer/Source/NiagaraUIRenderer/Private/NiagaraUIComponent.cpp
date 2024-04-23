@@ -80,6 +80,8 @@ struct FNiagaraRendererEntry
 
 void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::RenderUI);
+
 	NiagaraWidget->ClearRenderData();
 
 	if (!IsActive())
@@ -164,6 +166,7 @@ FORCEINLINE FVector2D FastRotate(const FVector2D Vector, float Sin, float Cos)
 
 void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::AddSpriteRendererData);
 	SCOPE_CYCLE_COUNTER(STAT_GenerateSpriteData);
 	FVector ComponentLocation = GetRelativeLocation();
 	FVector ComponentScale = GetRelativeScale3D();
@@ -385,6 +388,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 
 void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::AddRibbonRendererData);
 	SCOPE_CYCLE_COUNTER(STAT_GenerateRibbonData);
 	
 	FVector ComponentLocation = GetRelativeLocation();
