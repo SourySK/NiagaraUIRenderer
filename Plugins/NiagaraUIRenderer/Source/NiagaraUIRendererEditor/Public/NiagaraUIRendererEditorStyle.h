@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Runtime/Launch/Resources/Version.h"
+#include "Styling/SlateTypes.h"
 
 #if ENGINE_MINOR_VERSION < 1
 #include "Classes/EditorStyleSettings.h"

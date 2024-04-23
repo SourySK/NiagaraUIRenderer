@@ -5,6 +5,7 @@
 #include "NiagaraUIContentBrowserExtension.h"
 #include "NiagaraUIRendererEditorStyle.h"
 #include "NiagaraWidgetDetailCustomization.h"
+#include "PropertyEditorModule.h"
 
 #define LOCTEXT_NAMESPACE "FNiagaraUIRendererEditorModule"
 

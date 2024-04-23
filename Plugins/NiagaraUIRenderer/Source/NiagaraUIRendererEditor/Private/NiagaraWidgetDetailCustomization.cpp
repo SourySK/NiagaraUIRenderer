@@ -13,6 +13,9 @@
 #include "NiagaraUIComponent.h"
 #include "NiagaraUIRendererEditorStyle.h"
 #include "Widgets/Text/SMultiLineEditableText.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Images/SImage.h"
+#include "Editor.h"
 
 #if ENGINE_MINOR_VERSION >= 2
 #include "MaterialDomain.h"

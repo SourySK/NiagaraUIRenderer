@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
+#include "NiagaraSystemWidget.h"
 
 /**
  * 
@@ -40,7 +41,7 @@ private:
 	FText BuildWarningMessage();
 
 private:
-	TWeakObjectPtr<class UNiagaraSystemWidget> CachedNiagaraWidget;
+	TWeakObjectPtr<UNiagaraSystemWidget> CachedNiagaraWidget;
 	TWeakPtr<IDetailLayoutBuilder> CachedDetailBuilder;
 
 	TArray<FString> WarningMessages;
