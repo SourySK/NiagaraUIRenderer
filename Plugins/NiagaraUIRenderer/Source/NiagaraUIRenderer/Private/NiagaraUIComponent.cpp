@@ -107,7 +107,11 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 			}
 		}
 #else
-		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+		#if ENGINE_MINOR_VERSION < 4
+			FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+		#else
+			FVersionedNiagaraEmitter Emitter = EmitterInst->GetVersionedEmitter();
+		#endif
 
 		if (Emitter.Emitter)
 		{
@@ -166,7 +170,12 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	FRotator ComponentRotation = GetRelativeRotation();
 	float ComponentPitchRadians = FMath::DegreesToRadians(ComponentRotation.Pitch);
 
+#if ENGINE_MINOR_VERSION < 4
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
+#else
+	const FNiagaraDataSet& DataSet = EmitterInst->GetParticleData();
+#endif
+			
 	
 	if (!DataSet.IsCurrentDataValid())
 		return;
@@ -180,8 +189,10 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 #if ENGINE_MINOR_VERSION < 1		
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
-#else
+#elif ENGINE_MINOR_VERSION < 4
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetVersionedEmitter().GetEmitterData()->bLocalSpace;
 #endif
 			
 
@@ -380,7 +391,12 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	FVector ComponentScale = GetRelativeScale3D();
 	FRotator ComponentRotation = GetRelativeRotation();
 
+#if ENGINE_MINOR_VERSION < 4
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
+#else
+	const FNiagaraDataSet& DataSet = EmitterInst->GetParticleData();
+#endif
+			
 	
 	if (!DataSet.IsCurrentDataValid())
 		return;
@@ -455,8 +471,10 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 #if ENGINE_MINOR_VERSION < 1		
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
-#else
+#elif ENGINE_MINOR_VERSION < 4
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetVersionedEmitter().GetEmitterData()->bLocalSpace;
 #endif
 			
 	const bool FullIDs = RibbonFullIDData.IsValid();

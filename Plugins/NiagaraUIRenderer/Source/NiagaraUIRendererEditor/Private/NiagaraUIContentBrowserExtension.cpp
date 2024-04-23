@@ -103,7 +103,7 @@ struct FCreateNiagaraUIMaterialsExtension : public FContentBrowserSelectedAssetE
 					for (UMaterialExpression* TestExp : NewMaterial->GetExpressions())
 #endif
 					{
-						TArray<FExpressionInput*> Inputs = TestExp->GetInputs();
+						TArrayView<FExpressionInput*> Inputs = TestExp->GetInputsView();
 
 						for (FExpressionInput* Input : Inputs)
 						{

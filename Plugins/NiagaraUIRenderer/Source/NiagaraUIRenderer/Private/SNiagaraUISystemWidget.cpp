@@ -6,7 +6,7 @@
 #include "NiagaraWidgetProperties.h"
 #include "NiagaraUIComponent.h"
 
-TMap<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>> SNiagaraUISystemWidget::MaterialBrushMap;
+TMap<TObjectPtr<UMaterialInterface>, TSharedPtr<FSlateMaterialBrush>> SNiagaraUISystemWidget::MaterialBrushMap;
 
 void SNiagaraUISystemWidget::Construct(const FArguments& Args)
 {
@@ -130,7 +130,7 @@ void SNiagaraUISystemWidget::AddReferencedObjects(FReferenceCollector& Collector
 {
     SMeshWidget::AddReferencedObjects(Collector);
 
-    for (TTuple<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>>& element : MaterialBrushMap)
+    for (TTuple<TObjectPtr<UMaterialInterface>, TSharedPtr<FSlateMaterialBrush>>& element : MaterialBrushMap)
     {
         Collector.AddReferencedObject(element.Key);
 
