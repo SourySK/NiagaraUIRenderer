@@ -26,7 +26,8 @@ public class NiagaraUIRendererEditor : ModuleRules
 			new string[]
 			{
 				"Core",
-				"UMG",
+				"UMG", 
+				"NiagaraUIRenderer",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

@@ -12,6 +12,7 @@
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionParticleColor.h"
 #include "IContentBrowserSingleton.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
 
 #if UE_5_2_OR_LATER
 #include "MaterialDomain.h"
@@ -104,7 +105,7 @@ struct FCreateNiagaraUIMaterialsExtension : public FContentBrowserSelectedAssetE
 					for (UMaterialExpression* TestExp : NewMaterial->GetExpressions())
 #endif
 					{
-						TArray<FExpressionInput*> Inputs = TestExp->GetInputs();
+						TArrayView<FExpressionInput*> Inputs = TestExp->GetInputsView();
 
 						for (FExpressionInput* Input : Inputs)
 						{

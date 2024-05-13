@@ -89,7 +89,7 @@ public:
 		not rendering correctly, if used outside UI renderer.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer")
-	TMap<UMaterialInterface*, UMaterialInterface*> MaterialRemapList;
+	TMap<TObjectPtr<UMaterialInterface>, UMaterialInterface*> MaterialRemapList;
 
 	// Should be this particle system automatically activated?
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")

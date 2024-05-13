@@ -14,6 +14,9 @@
 #include "NiagaraUIRendererEditorStyle.h"
 #include "NiagaraUIRendererVersionUtil.h"
 #include "Widgets/Text/SMultiLineEditableText.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Images/SImage.h"
+#include "Editor.h"
 
 #if UE_5_2_OR_LATER
 #include "MaterialDomain.h"

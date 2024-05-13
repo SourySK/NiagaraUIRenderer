@@ -6,7 +6,7 @@
 #include "NiagaraWidgetProperties.h"
 #include "NiagaraUIComponent.h"
 
-TMap<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>> SNiagaraUISystemWidget::MaterialBrushMap;
+TMap<TObjectPtr<UMaterialInterface>, TSharedPtr<FSlateMaterialBrush>> SNiagaraUISystemWidget::MaterialBrushMap;
 
 void SNiagaraUISystemWidget::Construct(const FArguments& Args)
 {
@@ -20,6 +20,8 @@ SNiagaraUISystemWidget::~SNiagaraUISystemWidget()
 
 int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
+    TRACE_CPUPROFILER_EVENT_SCOPE(SNiagaraUISystemWidget::OnPaint);
+
     if (!NiagaraComponent.IsValid())
         return LayerId;
 
@@ -130,7 +132,7 @@ void SNiagaraUISystemWidget::AddReferencedObjects(FReferenceCollector& Collector
 {
     SMeshWidget::AddReferencedObjects(Collector);
 
-    for (TTuple<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>>& element : MaterialBrushMap)
+    for (TTuple<TObjectPtr<UMaterialInterface>, TSharedPtr<FSlateMaterialBrush>>& element : MaterialBrushMap)
     {
         Collector.AddReferencedObject(element.Key);
 

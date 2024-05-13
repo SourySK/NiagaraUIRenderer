@@ -47,7 +47,7 @@ public:
 private:
 	TWeakObjectPtr<UNiagaraUIComponent> NiagaraComponent;
 
-	static TMap<UMaterialInterface*, TSharedPtr<FSlateMaterialBrush>> MaterialBrushMap;
+	static TMap<TObjectPtr<UMaterialInterface>, TSharedPtr<FSlateMaterialBrush>> MaterialBrushMap;
 
 	FNiagaraWidgetProperties WidgetProperties = FNiagaraWidgetProperties(nullptr, true, false, false, false, 1.f);
 

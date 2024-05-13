@@ -81,6 +81,8 @@ struct FNiagaraRendererEntry
 
 void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::RenderUI);
+
 	NiagaraWidget->ClearRenderData();
 
 	if (!IsActive())
@@ -108,7 +110,11 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 			}
 		}
 #else
-		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+		#if ENGINE_MINOR_VERSION < 4
+			FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+		#else
+			FVersionedNiagaraEmitter Emitter = EmitterInst->GetVersionedEmitter();
+		#endif
 
 		if (Emitter.Emitter)
 		{
@@ -161,13 +167,19 @@ FORCEINLINE FVector2D FastRotate(const FVector2D Vector, float Sin, float Cos)
 
 void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::AddSpriteRendererData);
 	SCOPE_CYCLE_COUNTER(STAT_GenerateSpriteData);
 	FVector ComponentLocation = GetRelativeLocation();
 	FVector ComponentScale = GetRelativeScale3D();
 	FRotator ComponentRotation = GetRelativeRotation();
 	float ComponentPitchRadians = FMath::DegreesToRadians(ComponentRotation.Pitch);
 
+#if ENGINE_MINOR_VERSION < 4
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
+#else
+	const FNiagaraDataSet& DataSet = EmitterInst->GetParticleData();
+#endif
+			
 	
 	if (!DataSet.IsCurrentDataValid())
 		return;
@@ -181,8 +193,10 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 #if UE_5_0_OR_EARLIER
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
-#else
+#elif ENGINE_MINOR_VERSION < 4
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetVersionedEmitter().GetEmitterData()->bLocalSpace;
 #endif
 			
 
@@ -375,13 +389,19 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 
 void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::AddRibbonRendererData);
 	SCOPE_CYCLE_COUNTER(STAT_GenerateRibbonData);
 	
 	FVector ComponentLocation = GetRelativeLocation();
 	FVector ComponentScale = GetRelativeScale3D();
 	FRotator ComponentRotation = GetRelativeRotation();
 
+#if ENGINE_MINOR_VERSION < 4
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
+#else
+	const FNiagaraDataSet& DataSet = EmitterInst->GetParticleData();
+#endif
+			
 	
 	if (!DataSet.IsCurrentDataValid())
 		return;
@@ -456,8 +476,10 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 #if UE_5_0_OR_EARLIER
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
-#else
+#elif ENGINE_MINOR_VERSION < 4
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
+#else
+	bool LocalSpace = EmitterInst->GetVersionedEmitter().GetEmitterData()->bLocalSpace;
 #endif
 			
 	const bool FullIDs = RibbonFullIDData.IsValid();
