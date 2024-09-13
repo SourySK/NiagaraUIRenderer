@@ -43,7 +43,7 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 {
 	const FVector NewLocation(Location.X, 0.f, -Location.Y);
 	const FVector NewScale(Scale.X, 1.f, Scale.Y);
-	const FRotator NewRotation(FMath::RadiansToDegrees(Angle), 0.f, 0.f);;
+	const FRotator NewRotation(Angle, 0.f, 0.f);;
 	
 	SetRelativeTransform(FTransform(NewRotation, NewLocation, NewScale));
 

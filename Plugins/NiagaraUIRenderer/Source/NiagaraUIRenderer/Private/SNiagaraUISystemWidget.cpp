@@ -35,7 +35,11 @@ int32 SNiagaraUISystemWidget::OnPaint(const FPaintArgs& Args, const FGeometry& A
     
     const FVector2D Location2D = (AllottedGeometry.GetAbsolutePositionAtCoordinates(FVector2D(0.5f, 0.5f)) - FVector2D(ParentTopLeft)) / LayoutScale;
     const FScale2D Scale2D = SlateRenderTransform.GetMatrix().GetScale();
-    const float Angle = SlateRenderTransform.GetMatrix().GetRotationAngle();
+
+    float A, B, C, D;
+    SlateRenderTransform.GetMatrix().GetMatrix(A, B, C, D);
+    const float AdditionalAngle = D < 0.f ? 180.f : 0.f;
+    const float Angle = FMath::RadiansToDegrees(FMath::Atan(C / D)) + AdditionalAngle;
 
     UNiagaraUIComponent* NiagaraUIComponent = NiagaraComponent.Get();
 
