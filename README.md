@@ -2,7 +2,7 @@
 
 Note: UE5 branch was merged into main, UE4 now has a separate branch
 
-Niagara UI Plugin adds Niagara Particle System Widget that allows you to render Niagara particle systems directly into the UI. The plugin supports sprite and ribbon CPU particles. It was tested on Windows and Android, but it should work fine on other platforms too.
+Niagara UI Plugin adds Niagara Particle System Widget that allows you to render Niagara particle systems directly into the UI. The plugin supports sprite and ribbon CPU particles. It was tested on Windows and Android, but it should work fine on other platforms too (it’s necessary to add the platforms to the “SupportedTargetPlatforms” and “PlatformAllowList” in the “NiagaraUIRenderer.uplugin” and compile the plugin yourself).
 
 Demo Video:  
 [![Niagara UI Renderer Demo Video](http://img.youtube.com/vi/iFa40Sf4QPA/0.jpg)](http://www.youtube.com/watch?v=iFa40Sf4QPA "Niagara UI Renderer Demo")
