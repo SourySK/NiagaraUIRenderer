@@ -80,6 +80,9 @@ void UNiagaraSystemWidget::InitializeNiagaraUI()
 {
 	if (UWorld* World = GetWorld())
 	{
+		if(World->bIsTearingDown)
+			return;
+		
 		if (!World->PersistentLevel)
 			return;
 
