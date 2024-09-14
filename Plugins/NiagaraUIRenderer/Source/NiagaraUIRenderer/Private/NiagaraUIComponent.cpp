@@ -45,6 +45,8 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	const FVector NewScale(Scale.X, 1.f, Scale.Y);
 	const FRotator NewRotation(Angle, 0.f, 0.f);;
 	
+	WidgetRotationAngle = Angle;
+	
 	SetRelativeTransform(FTransform(NewRotation, NewLocation, NewScale));
 
 	if (AutoActivateParticle)
@@ -170,8 +172,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	SCOPE_CYCLE_COUNTER(STAT_GenerateSpriteData);
 	FVector ComponentLocation = GetRelativeLocation();
 	FVector ComponentScale = GetRelativeScale3D();
-	FRotator ComponentRotation = GetRelativeRotation();
-	float ComponentPitchRadians = FMath::DegreesToRadians(ComponentRotation.Pitch);
+	float WidgetRotationAngleRadians = FMath::DegreesToRadians(WidgetRotationAngle);
 
 #if ENGINE_MINOR_VERSION < 4
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
@@ -271,7 +272,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		if (LocalSpace)
 		{
 			ParticlePosition *= FVector2f(ComponentScale.X, ComponentScale.Z);
-			ParticlePosition  = ParticlePosition.GetRotated(-ComponentRotation.Pitch);
+			ParticlePosition  = ParticlePosition.GetRotated(-WidgetRotationAngle);
 			ParticlePosition += ParentTopLeft;	
 			ParticlePosition += FVector2f(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
 			
@@ -307,7 +308,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 			
 			if ( LocalSpace)
 			{
-				const float ParticleRotation = FMath::Acos(ParticleRotationCos * SinSign) - ComponentPitchRadians;
+				const float ParticleRotation = FMath::Acos(ParticleRotationCos * SinSign) - WidgetRotationAngleRadians;
 				FMath::SinCos(&ParticleRotationSin, &ParticleRotationCos, ParticleRotation);				
 			}
 			else
@@ -320,7 +321,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 			float ParticleRotation = GetParticleRotation(ParticleIndex);
 			
 			if (LocalSpace)
-				ParticleRotation -= ComponentRotation.Pitch;
+				ParticleRotation -= WidgetRotationAngle;
 			
 			FMath::SinCos(&ParticleRotationSin, &ParticleRotationCos, FMath::DegreesToRadians(ParticleRotation));
 		}
@@ -393,7 +394,6 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	
 	FVector ComponentLocation = GetRelativeLocation();
 	FVector ComponentScale = GetRelativeScale3D();
-	FRotator ComponentRotation = GetRelativeRotation();
 
 #if ENGINE_MINOR_VERSION < 4
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
@@ -519,7 +519,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		if (LocalSpace)
 		{
 			LastParticleUIPosition *= FVector2f(ComponentScale.X, ComponentScale.Z);
-			LastParticleUIPosition = LastParticleUIPosition.GetRotated(-ComponentRotation.Pitch);
+			LastParticleUIPosition = LastParticleUIPosition.GetRotated(-WidgetRotationAngle);
 			LastParticleUIPosition += ParentTopLeft;
 			
 			LastParticleUIPosition += FVector2f(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
@@ -587,7 +587,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 			if (LocalSpace)
 			{
 				CurrentParticleUIPosition *= FVector2f(ComponentScale.X, ComponentScale.Z);
-				CurrentParticleUIPosition = CurrentParticleUIPosition.GetRotated(-ComponentRotation.Pitch);
+				CurrentParticleUIPosition = CurrentParticleUIPosition.GetRotated(-WidgetRotationAngle);
 				CurrentParticleUIPosition += ParentTopLeft;
 				CurrentParticleUIPosition += FVector2f(ComponentLocation.X, -ComponentLocation.Z) * ScaleFactor;
 			}

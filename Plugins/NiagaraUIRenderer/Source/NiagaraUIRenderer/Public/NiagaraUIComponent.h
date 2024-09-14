@@ -42,5 +42,8 @@ private:
 
 	// Indicates if the position of the transform was ever set based on the UI position
 	bool HasSetTransform = false;
+
+	// Cached angle of the widget
+	float WidgetRotationAngle;
 	
 };
