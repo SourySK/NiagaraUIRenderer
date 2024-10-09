@@ -11,6 +11,19 @@
 class SNiagaraUISystemWidget;
 class FNiagaraEmitterInstance;
 
+struct FNiagaraUIRenderProperties
+{
+public:
+	FNiagaraUIRenderProperties(float InScaleFactor, FVector2f InParentTopLeft, FLinearColor InTint)
+		: ScaleFactor(InScaleFactor), ParentTopLeft(InParentTopLeft), Tint(InTint)
+		{ }
+	
+public:
+	float ScaleFactor;
+	FVector2f ParentTopLeft;
+	FLinearColor Tint;
+};
+
 /**
  * 
  */
@@ -27,13 +40,13 @@ public:
 	
 	void SetTransformationForUIRendering(FVector2D Location, FVector2f Scale, float Angle);
 
-	void RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
+	void RenderUI(SNiagaraUISystemWidget* NiagaraWidget, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties);
 
 	void AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst,
-								class UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
+								class UNiagaraSpriteRendererProperties* SpriteRenderer, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties);
 
 	void AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst,
-                                class UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties);
+                                class UNiagaraRibbonRendererProperties* RibbonRenderer, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties);
 
 	
 	

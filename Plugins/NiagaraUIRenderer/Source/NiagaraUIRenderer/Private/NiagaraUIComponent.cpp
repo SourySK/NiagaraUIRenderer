@@ -80,7 +80,7 @@ struct FNiagaraRendererEntry
 };
 #endif
 
-void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::RenderUI);
 
@@ -148,11 +148,11 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, float 
 				
 				if (UNiagaraSpriteRendererProperties* SpriteRenderer = Cast<UNiagaraSpriteRendererProperties>(Renderer.RendererProperties))
 				{
-					AddSpriteRendererData(NiagaraWidget, Renderer.EmitterInstance, SpriteRenderer, ScaleFactor, ParentTopLeft, WidgetProperties);
+					AddSpriteRendererData(NiagaraWidget, Renderer.EmitterInstance, SpriteRenderer, RenderProperties, WidgetProperties);
 				}
 				else if (UNiagaraRibbonRendererProperties* RibbonRenderer = Cast<UNiagaraRibbonRendererProperties>(Renderer.RendererProperties))
 				{
-					AddRibbonRendererData(NiagaraWidget, Renderer.EmitterInstance, RibbonRenderer, ScaleFactor, ParentTopLeft, WidgetProperties);                		
+					AddRibbonRendererData(NiagaraWidget, Renderer.EmitterInstance, RibbonRenderer, RenderProperties, WidgetProperties);                		
 				}
 			}
 		}
@@ -166,7 +166,7 @@ FORCEINLINE FVector2D FastRotate(const FVector2D Vector, float Sin, float Cos)
 }
 
 
-void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraSpriteRendererProperties* SpriteRenderer, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::AddSpriteRendererData);
 	SCOPE_CYCLE_COUNTER(STAT_GenerateSpriteData);
@@ -189,6 +189,10 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	if (ParticleCount < 1)
 		return;
+
+	const float& ScaleFactor = RenderProperties.ScaleFactor;
+	const FVector2f& ParentTopLeft = RenderProperties.ParentTopLeft;
+	const FLinearColor& Tint = RenderProperties.Tint;
 
 	
 #if ENGINE_MINOR_VERSION < 1		
@@ -224,9 +228,9 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		return PositionData.GetSafe(Index, FVector::ZeroVector).Y;
 	};	
 
-	auto GetParticleColor = [&ColorData](int32 Index)
+	auto GetParticleColor = [&ColorData, &Tint](int32 Index)
 	{
-		return ColorData.GetSafe(Index, FLinearColor::White);
+		return ColorData.GetSafe(Index, FLinearColor::White) * Tint;
 	};
 	
 	auto GetParticleVelocity2D = [&VelocityData](int32 Index)
@@ -387,7 +391,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	}
 }
 
-void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, float ScaleFactor, FVector2f ParentTopLeft, const FNiagaraWidgetProperties* WidgetProperties)
+void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst, UNiagaraRibbonRendererProperties* RibbonRenderer, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties)
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(UNiagaraUIComponent::AddRibbonRendererData);
 	SCOPE_CYCLE_COUNTER(STAT_GenerateRibbonData);
@@ -410,6 +414,10 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 	if (ParticleCount < 2)
 		return;
+			
+	const float& ScaleFactor = RenderProperties.ScaleFactor;
+	const FVector2f& ParentTopLeft = RenderProperties.ParentTopLeft;
+	const FLinearColor& Tint = RenderProperties.Tint;
 	
 #if ENGINE_MINOR_VERSION < 3
 	const auto SortKeyReader = RibbonRenderer->SortKeyDataSetAccessor.GetReader(DataSet);
@@ -458,9 +466,9 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		return FVector2f(Position3D.X, -Position3D.Z);
 	};	
 
-	auto GetParticleColor = [&ColorData](int32 Index)
+	auto GetParticleColor = [&ColorData, &Tint](int32 Index)
 	{
-		return ColorData.GetSafe(Index, FLinearColor::White);
+		return ColorData.GetSafe(Index, FLinearColor::White) * Tint;
 	};
 	
 	auto GetParticleWidth = [&RibbonWidthData](int32 Index)

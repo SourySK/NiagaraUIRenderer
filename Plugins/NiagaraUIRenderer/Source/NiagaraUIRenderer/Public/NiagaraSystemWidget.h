@@ -60,6 +60,8 @@ public:
 	// Updates the desired widget size. If calling from code call this instead of setting the DesiredWidgetSize directly.
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	void SetDesiredWidgetSize(FVector2D NewDesiredSize);
+
+	const FVector2D& GetDesiredWidgetSize() const;
 	
 	/** 
 	 *	Sets / Updates a remap material for a source particle material
@@ -73,6 +75,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	UMaterialInterface* GetRemapMaterial(UMaterialInterface* OriginalMaterial);
 
+	// Set the color and opacity to a specified value
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	void SetColorAndOpacity(FLinearColor InColorAndOpacity);
+
+	const FLinearColor& GetColorAndOpacity() const;
+
 public:
 	// Reference to the niagara system asset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", DisplayName = "Niagara System", BlueprintSetter = UpdateNiagaraSystemReference)
@@ -81,7 +89,7 @@ public:
 	/*
 		List of material references used to remap materials on the particle system, to materials with "User Interface" material domain.
 
-		Every Key (Material on the left) will be remapped to it's Value (Material on the right)
+		Every Key (Material on the left) will be remapped to its Value (Material on the right)
 
 		This is useful for keeping the particle system rendering correctly in the niagara editor and in the world, while it still can be used as UI particle system.
 
@@ -100,8 +108,12 @@ public:
 	bool TickWhenPaused = false;
 
 	// The size of this particle widget used when calculating it's desired size. Don't set directly from code, call SetDesiredWidgetSize instead.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", meta = (ClampMin = 0.f, UIMax = 4096.f))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Getter, Setter, BlueprintSetter = "SetDesiredWidgetSize", Category = "Niagara UI Renderer", meta = (ClampMin = 0.f, UIMax = 4096.f))
 	FVector2D DesiredWidgetSize = FVector2D(256., 256.);
+
+	// This color will be used as a multiplier with the particle color to calculate the final vertex color
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Getter, Setter, BlueprintSetter = "SetColorAndOpacity", Category = "Niagara UI Renderer", meta = (sRGB = "true"))
+	FLinearColor ColorAndOpacity = FLinearColor::White;
 
 	// Scale particles based on their position in Y-axis (towards the camera)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
@@ -122,6 +134,10 @@ public:
 	// Disable warnings for this Widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
 	bool DisableWarnings = false;
+
+	// Should the system restart simulation when a property is changed
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer", AdvancedDisplay)
+	bool RestartSimulationOnPropertyChange = true;
 
 private:
 	TSharedPtr<SNiagaraUISystemWidget> NiagaraSlateWidget;
