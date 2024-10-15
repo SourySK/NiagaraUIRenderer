@@ -5,6 +5,7 @@
 #include "ContentBrowserDelegates.h"
 #include "ContentBrowserModule.h"
 #include "NiagaraUIRendererEditorStyle.h"
+#include "NiagaraUIRendererVersionUtil.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "MaterialEditingLibrary.h"
 #include "MaterialGraph/MaterialGraph.h"
@@ -13,7 +14,7 @@
 #include "IContentBrowserSingleton.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 
-#if ENGINE_MINOR_VERSION >= 2
+#if UE_5_2_OR_LATER
 #include "MaterialDomain.h"
 #endif
 
@@ -69,7 +70,7 @@ struct FCreateNiagaraUIMaterialsExtension : public FContentBrowserSelectedAssetE
 			NewMaterial->MaterialDomain = EMaterialDomain::MD_UI;
 
 
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 			for (UMaterialExpression* Expression : NewMaterial->Expressions)
 #else
 			for (UMaterialExpression* Expression : NewMaterial->GetExpressions())
@@ -98,7 +99,7 @@ struct FCreateNiagaraUIMaterialsExtension : public FContentBrowserSelectedAssetE
 					if (EmissiveInput->Expression == nullptr && BaseInput->Expression)
 						EmissiveInput->Expression = BaseInput->Expression;
 
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 					for (UMaterialExpression* TestExp : NewMaterial->Expressions)
 #else
 					for (UMaterialExpression* TestExp : NewMaterial->GetExpressions())
@@ -201,7 +202,7 @@ public:
 		{
 			const FAssetData& Asset = *AssetIt;
 			
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 			AnyMaterials = AnyMaterials || (Asset.AssetClass == UMaterial::StaticClass()->GetFName());
 #else
 			AnyMaterials = AnyMaterials || (Asset.AssetClassPath == UMaterial::StaticClass()->GetClassPathName());
