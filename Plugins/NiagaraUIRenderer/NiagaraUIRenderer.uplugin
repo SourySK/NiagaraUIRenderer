@@ -17,7 +17,10 @@
 	"Installed": false,
 	"SupportedTargetPlatforms": [
 		"Win64",
-		"Android"
+		"Mac",
+		"Linux",
+		"Android",
+		"IOS"
 	],
 	"Modules": [
 		{
@@ -26,7 +29,10 @@
 			"LoadingPhase": "PreDefault",
 			"PlatformAllowList": [
 				"Win64",
-				"Android"
+				"Mac",
+				"Linux",
+				"Android",
+				"IOS"
 			]
 		},
 		{
@@ -34,7 +40,9 @@
 			"Type": "Editor",
 			"LoadingPhase": "Default",
 			"PlatformAllowList": [
-				"Win64"
+				"Win64",
+				"Mac",
+				"Linux"
 			]
 		}
 	],
