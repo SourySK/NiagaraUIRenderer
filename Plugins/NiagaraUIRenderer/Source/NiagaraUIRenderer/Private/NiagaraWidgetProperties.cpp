@@ -1,3 +1,3 @@
-﻿// Copyright 2023 - Michal Smoleň
+﻿// Copyright 2024 - Michal Smoleň
 
 #include "NiagaraWidgetProperties.h"

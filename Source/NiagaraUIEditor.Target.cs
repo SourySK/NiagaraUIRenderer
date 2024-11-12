@@ -1,4 +1,4 @@
-// Copyright 2023 - Michal Smoleň
+// Copyright 2024 - Michal Smoleň
 
 using UnrealBuildTool;
 using System.Collections.Generic;
