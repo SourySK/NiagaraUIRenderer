@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraUIRendererVersionUtil.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Styling/SlateTypes.h"
 
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 #include "Classes/EditorStyleSettings.h"
 #endif
 

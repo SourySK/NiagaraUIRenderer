@@ -12,12 +12,13 @@
 #include "NiagaraSystemWidget.h"
 #include "NiagaraUIComponent.h"
 #include "NiagaraUIRendererEditorStyle.h"
+#include "NiagaraUIRendererVersionUtil.h"
 #include "Widgets/Text/SMultiLineEditableText.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Images/SImage.h"
 #include "Editor.h"
 
-#if ENGINE_MINOR_VERSION >= 2
+#if UE_5_2_OR_LATER
 #include "MaterialDomain.h"
 #endif
 
@@ -132,7 +133,7 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
 		
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			if (Emitter->SimTarget != ENiagaraSimTarget::CPUSim)
@@ -261,7 +262,7 @@ void FNiagaraWidgetDetailCustomization::DisplayWarningBox(IDetailLayoutBuilder& 
 		.WholeRowContent()
 		[
 			SNew(SBorder)
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 			.BorderImage(FEditorStyle::GetBrush("NoBorder"))
 #else
 			.BorderImage(FAppStyle::GetBrush("NoBorder"))
@@ -386,7 +387,7 @@ void FNiagaraWidgetDetailCustomization::OnAutoPopulatePressed()
 
 	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
-#if ENGINE_MINOR_VERSION < 1
+#if UE_5_0_OR_EARLIER
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			if (Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
