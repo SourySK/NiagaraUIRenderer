@@ -209,13 +209,14 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	FVector2D SubImageSize = SpriteRenderer->SubImageSize;
 	FVector2D SubImageDelta = FVector2D::UnitVector / SubImageSize;
 
-	const auto PositionData = FNiagaraDataSetAccessor<FNiagaraPosition>::	CreateReader(DataSet, SpriteRenderer->PositionBinding.GetDataSetBindableVariable().GetName());
-	const auto ColorData	= FNiagaraDataSetAccessor<FLinearColor>::		CreateReader(DataSet, SpriteRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
-	const auto VelocityData = FNiagaraDataSetAccessor<FVector3f>::			CreateReader(DataSet, SpriteRenderer->VelocityBinding.GetDataSetBindableVariable().GetName());
-	const auto SizeData		= FNiagaraDataSetAccessor<FVector2f>::			CreateReader(DataSet, SpriteRenderer->SpriteSizeBinding.GetDataSetBindableVariable().GetName());
-	const auto RotationData = FNiagaraDataSetAccessor<float>::				CreateReader(DataSet, SpriteRenderer->SpriteRotationBinding.GetDataSetBindableVariable().GetName());
-	const auto SubImageData = FNiagaraDataSetAccessor<float>::				CreateReader(DataSet, SpriteRenderer->SubImageIndexBinding.GetDataSetBindableVariable().GetName());
-	const auto DynamicMaterialData = FNiagaraDataSetAccessor<FVector4f>::	CreateReader(DataSet, SpriteRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
+	const auto PositionData			= FNiagaraDataSetAccessor<FNiagaraPosition>::	CreateReader(DataSet, SpriteRenderer->PositionBinding.GetDataSetBindableVariable().GetName());
+	const auto ColorData			= FNiagaraDataSetAccessor<FLinearColor>::		CreateReader(DataSet, SpriteRenderer->ColorBinding.GetDataSetBindableVariable().GetName());
+	const auto VelocityData			= FNiagaraDataSetAccessor<FVector3f>::			CreateReader(DataSet, SpriteRenderer->VelocityBinding.GetDataSetBindableVariable().GetName());
+	const auto AlignmentData		= FNiagaraDataSetAccessor<FVector3f>::			CreateReader(DataSet, SpriteRenderer->SpriteAlignmentBinding.GetDataSetBindableVariable().GetName());
+	const auto SizeData				= FNiagaraDataSetAccessor<FVector2f>::			CreateReader(DataSet, SpriteRenderer->SpriteSizeBinding.GetDataSetBindableVariable().GetName());
+	const auto RotationData			= FNiagaraDataSetAccessor<float>::				CreateReader(DataSet, SpriteRenderer->SpriteRotationBinding.GetDataSetBindableVariable().GetName());
+	const auto SubImageData			= FNiagaraDataSetAccessor<float>::				CreateReader(DataSet, SpriteRenderer->SubImageIndexBinding.GetDataSetBindableVariable().GetName());
+	const auto DynamicMaterialData	= FNiagaraDataSetAccessor<FVector4f>::			CreateReader(DataSet, SpriteRenderer->DynamicMaterialBinding.GetDataSetBindableVariable().GetName());
 
 	auto GetParticlePosition2D = [&PositionData](int32 Index)
 	{
@@ -237,6 +238,12 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	{
 		const FVector3f Velocity3D = VelocityData.GetSafe(Index, FVector3f::ZeroVector);
 		return FVector2D(Velocity3D.X, Velocity3D.Z);
+	};
+	
+	auto GetParticleAlignment2D = [&AlignmentData](int32 Index)
+	{
+		const FVector3f Alignment3D = AlignmentData.GetSafe(Index, FVector3f::ZeroVector);
+		return FVector2D(Alignment3D.X, Alignment3D.Z);
 	};
 	
 	auto GetParticleSize = [&SizeData](int32 Index)
@@ -303,16 +310,16 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 		
 		float ParticleRotationSin, ParticleRotationCos;
 
-		if (SpriteRenderer->Alignment == ENiagaraSpriteAlignment::VelocityAligned)
+		if (SpriteRenderer->Alignment == ENiagaraSpriteAlignment::VelocityAligned || SpriteRenderer->Alignment == ENiagaraSpriteAlignment::CustomAlignment)
 		{
-			const FVector2D ParticleVelocity = GetParticleVelocity2D(ParticleIndex);
+			const FVector2D AlignmentVector = SpriteRenderer->Alignment == ENiagaraSpriteAlignment::VelocityAligned ? GetParticleVelocity2D(ParticleIndex) : GetParticleAlignment2D(ParticleIndex);
 
-			ParticleRotationCos = FVector2D::DotProduct(ParticleVelocity.GetSafeNormal(), FVector2D(0.f, 1.f));
-			const float SinSign = FMath::Sign(FVector2D::DotProduct(ParticleVelocity, FVector2D(1.f, 0.f)));
-			
-			if ( LocalSpace)
+			ParticleRotationCos = FVector2D::DotProduct(AlignmentVector.GetSafeNormal(), FVector2D(0.f, 1.f));
+			const float SinSign = FVector2D::DotProduct(AlignmentVector, FVector2D(1.f, 0.f)) >= 0.f ? 1.f : -1.f;
+		
+			if (LocalSpace)
 			{
-				const float ParticleRotation = FMath::Acos(ParticleRotationCos * SinSign) - WidgetRotationAngleRadians;
+				const float ParticleRotation = FMath::Acos(ParticleRotationCos) * SinSign - WidgetRotationAngleRadians;
 				FMath::SinCos(&ParticleRotationSin, &ParticleRotationCos, ParticleRotation);				
 			}
 			else
