@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraWidgetProperties.h"
-#include "Runtime/UMG/Public/Components/Widget.h"
+#include "Components/Widget.h"
 #include "NiagaraSystemWidget.generated.h"
 
 class SNiagaraUISystemWidget;
