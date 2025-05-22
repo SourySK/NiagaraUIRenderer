@@ -104,13 +104,15 @@ struct FCreateNiagaraUIMaterialsExtension : public FContentBrowserSelectedAssetE
 					for (UMaterialExpression* TestExp : NewMaterial->GetExpressions())
 #endif
 					{
-#if ENGINE_MINOR_VERSION > 2
-						TArrayView<FExpressionInput*> Inputs = TestExp->GetInputsView();
-#else
+#if ENGINE_MINOR_VERSION <= 2
 						TArray<FExpressionInput*> Inputs = TestExp->GetInputs();
-#endif
-
 						for (FExpressionInput* Input : Inputs)
+#elif ENGINE_MINOR_VERSION < 5
+						TArrayView<FExpressionInput*> Inputs = TestExp->GetInputsView();
+						for (FExpressionInput* Input : Inputs)
+#else
+						for (FExpressionInputIterator Input(TestExp); Input; ++Input)
+#endif
 						{
 							if (Input->Expression == Expression)
 							{
