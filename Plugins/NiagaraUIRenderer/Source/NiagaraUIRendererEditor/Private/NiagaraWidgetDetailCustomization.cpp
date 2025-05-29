@@ -176,7 +176,12 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 			}
 		}
 #else
+
+#if ENGINE_MINOR_VERSION >= 4
+		FVersionedNiagaraEmitter Emitter = EmitterInst->GetVersionedEmitter();
+#else
 		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
+#endif
 		
 		if (Emitter.GetEmitterData()->SimTarget != ENiagaraSimTarget::CPUSim)
 		{
@@ -394,7 +399,12 @@ void FNiagaraWidgetDetailCustomization::OnAutoPopulatePressed()
 			{
 				TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
 #else
+
+#if ENGINE_MINOR_VERSION >= 4
+		if (FVersionedNiagaraEmitterData* EmitterData = EmitterInst->GetVersionedEmitter().GetEmitterData())
+#else
 		if (FVersionedNiagaraEmitterData* EmitterData = EmitterInst->GetCachedEmitterData())
+#endif
 		{
 			if (EmitterData->SimTarget == ENiagaraSimTarget::CPUSim)
 			{
