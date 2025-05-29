@@ -92,7 +92,9 @@ void SNiagaraUISystemWidget::ClearRenderData()
 
 TSharedPtr<FSlateMaterialBrush> SNiagaraUISystemWidget::CreateSlateMaterialBrush(UMaterialInterface* Material)
 {
-    UMaterialInterface* MaterialToUse = WidgetProperties.MaterialRemapList->Contains(Material) && WidgetProperties.MaterialRemapList->Find(Material) != nullptr ? *WidgetProperties.MaterialRemapList->Find(Material) : Material;
+    const TObjectPtr<UMaterialInterface>* FoundMaterial = WidgetProperties.MaterialRemapList->Find(Material);
+    const bool FoundMaterialValid = FoundMaterial && *FoundMaterial != nullptr;
+    UMaterialInterface* MaterialToUse = FoundMaterialValid ? FoundMaterial->Get() : Material;
     
     if (MaterialBrushMap.Contains(MaterialToUse))
     {

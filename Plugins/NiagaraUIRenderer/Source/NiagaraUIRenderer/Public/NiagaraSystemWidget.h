@@ -9,6 +9,9 @@
 
 class SNiagaraUISystemWidget;
 class UMaterialInterface;
+class UNiagaraSystem;
+class ANiagaraUIActor;
+class UNiagaraUIComponent;
 
 /**
  The Niagara System Widget allows to render niagara particle system directly into the UI. Only sprite and ribbon CPU particles are supported.
@@ -84,7 +87,7 @@ public:
 public:
 	// Reference to the niagara system asset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", DisplayName = "Niagara System", BlueprintSetter = UpdateNiagaraSystemReference)
-	class UNiagaraSystem* NiagaraSystemReference;
+	TObjectPtr<UNiagaraSystem> NiagaraSystemReference;
 
 	/*
 		List of material references used to remap materials on the particle system, to materials with "User Interface" material domain.
@@ -97,7 +100,7 @@ public:
 		not rendering correctly, if used outside UI renderer.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer")
-	TMap<TObjectPtr<UMaterialInterface>, UMaterialInterface*> MaterialRemapList;
+	TMap<TObjectPtr<UMaterialInterface>, TObjectPtr<UMaterialInterface>> MaterialRemapList;
 
 	// Should be this particle system automatically activated?
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")
@@ -143,8 +146,8 @@ private:
 	TSharedPtr<SNiagaraUISystemWidget> NiagaraSlateWidget;
 
 	UPROPERTY()
-	class ANiagaraUIActor* NiagaraActor;
+	TObjectPtr<ANiagaraUIActor> NiagaraActor;
 
 	UPROPERTY()
-	class UNiagaraUIComponent* NiagaraComponent;
+	TObjectPtr<UNiagaraUIComponent> NiagaraComponent;
 };

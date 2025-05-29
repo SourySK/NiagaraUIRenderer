@@ -170,7 +170,7 @@ void UNiagaraSystemWidget::SetRemapMaterial(UMaterialInterface* OriginalMaterial
 
 UMaterialInterface* UNiagaraSystemWidget::GetRemapMaterial(UMaterialInterface* OriginalMaterial)
 {
-	if (UMaterialInterface** FoundMaterial = MaterialRemapList.Find(OriginalMaterial))
+	if (TObjectPtr<UMaterialInterface>* FoundMaterial = MaterialRemapList.Find(OriginalMaterial))
 		return *FoundMaterial;
 
 	return nullptr;

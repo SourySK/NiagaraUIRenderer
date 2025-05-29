@@ -202,8 +202,9 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 
 				if (RendererMaterial)
 				{
-					UMaterialInterface* ActualMaterial = CachedNiagaraWidget->MaterialRemapList.Contains(RendererMaterial) && *CachedNiagaraWidget->MaterialRemapList.Find(RendererMaterial) != nullptr
-													   ? *CachedNiagaraWidget->MaterialRemapList.Find(RendererMaterial) : RendererMaterial;
+					const TObjectPtr<UMaterialInterface>* RemapMaterial = CachedNiagaraWidget->MaterialRemapList.Find(RendererMaterial);
+					const bool RemapMaterialValid = RemapMaterial && *RemapMaterial != nullptr;
+					UMaterialInterface* ActualMaterial = RemapMaterialValid ? RemapMaterial->Get() : RendererMaterial;
 
 					if (ActualMaterial && ActualMaterial->GetMaterial()->MaterialDomain != EMaterialDomain::MD_UI)
 					{
