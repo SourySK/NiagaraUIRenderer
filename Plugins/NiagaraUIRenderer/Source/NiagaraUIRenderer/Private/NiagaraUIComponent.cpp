@@ -728,4 +728,20 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 
 }
 
+void UNiagaraUIComponent::SetIgnoreTimeDilation(bool bIgnore)
+{
+	bIgnoreTimeDilation = bIgnore;
+
+	if (bIgnoreTimeDilation)
+	{
+		SetForceSolo(true);
+	}
+}
+
+void UNiagaraUIComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{	
+	// Use FApp::GetDeltaTime() when want to ignore Time Dilation
+	Super::TickComponent(bIgnoreTimeDilation ? FApp::GetDeltaTime() : DeltaTime, TickType, ThisTickFunction);
+}
+
 //PRAGMA_ENABLE_OPTIMIZATION
