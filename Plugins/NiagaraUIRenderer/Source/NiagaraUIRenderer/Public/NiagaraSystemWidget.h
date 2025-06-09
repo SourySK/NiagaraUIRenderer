@@ -46,15 +46,19 @@ public:
 
 	// Deactivate Niagara System
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
-    void DeactivateSystem();
+    	void DeactivateSystem();
 
 	// Return Niagara Component reference for the particle system.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Niagara UI Renderer")
-    class UNiagaraUIComponent* GetNiagaraComponent();
+    	class UNiagaraUIComponent* GetNiagaraComponent();
 
 	// Updates the Niagara System reference. This will cause the particle system to reset
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
 	void UpdateNiagaraSystemReference(class UNiagaraSystem* NewNiagaraSystem);
+
+	// Set Ignore Time Dilation - Should be this particle system updated Ignore Time Dilation? Note that this will reset the particle simulation
+	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
+	void SetIgnoreTimeDilation(bool NewIgnoreTimeDilation);
 
 	// Updates Tick When Paused - Should be this particle system updated even when the game is paused? Note that this will reset the particle simulation
 	UFUNCTION(BlueprintCallable, Category = "Niagara UI Renderer")
@@ -105,6 +109,10 @@ public:
 	// Should be this particle system automatically activated?
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Niagara UI Renderer")
 	bool AutoActivate = true;
+
+	// Should be this particle system updated Ignore Time Dilation?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", BlueprintSetter = SetIgnoreTimeDilation)
+	bool bIgnoreTimeDilation = false;
 
 	// Should be this particle system updated even when the game is paused?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara UI Renderer", BlueprintSetter = UpdateTickWhenPaused)

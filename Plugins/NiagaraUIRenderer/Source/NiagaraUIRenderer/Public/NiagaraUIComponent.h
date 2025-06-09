@@ -48,7 +48,11 @@ public:
 	void AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraWidget, TSharedRef<const FNiagaraEmitterInstance> EmitterInst,
                                 class UNiagaraRibbonRendererProperties* RibbonRenderer, const FNiagaraUIRenderProperties& RenderProperties, const FNiagaraWidgetProperties* WidgetProperties);
 
-	
+	void SetIgnoreTimeDilation(bool bIgnore);
+
+protected:
+	// Override For Ignore World Time Dilation
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
 	
 private:
 	bool AutoActivateParticle = false;
@@ -58,5 +62,8 @@ private:
 
 	// Cached angle of the widget
 	float WidgetRotationAngle;
-	
+
+	// Ignore Time Dilation
+	bool bIgnoreTimeDilation = false;
+
 };
