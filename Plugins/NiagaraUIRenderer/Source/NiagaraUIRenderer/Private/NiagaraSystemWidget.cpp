@@ -105,6 +105,10 @@ void UNiagaraSystemWidget::InitializeNiagaraUI()
 
 		NiagaraComponent = NiagaraActor->SpawnNewNiagaraUIComponent(NiagaraSystemReference, AutoActivate, ShowDebugSystemInWorld, TickWhenPaused);
 
+		// For Ignore Time Dilation
+		if (NiagaraComponent)
+			NiagaraComponent->SetIgnoreTimeDilation(bIgnoreTimeDilation);
+		
 		NiagaraSlateWidget->SetNiagaraComponentReference(NiagaraComponent);
 	}
 }
@@ -137,6 +141,18 @@ void UNiagaraSystemWidget::UpdateNiagaraSystemReference(UNiagaraSystem* NewNiaga
 	}
 }
 
+void UNiagaraSystemWidget::SetIgnoreTimeDilation(bool NewIgnoreTimeDilation)
+{
+	bIgnoreTimeDilation = NewIgnoreTimeDilation;
+
+	if (NiagaraComponent)
+	{
+		NiagaraComponent->SetIgnoreTimeDilation(NewIgnoreTimeDilation);
+		NiagaraComponent->SetForceSolo(TickWhenPaused || NewIgnoreTimeDilation);
+		NiagaraComponent->ResetSystem();
+	}
+}
+
 void UNiagaraSystemWidget::UpdateTickWhenPaused(bool NewTickWhenPaused)
 {
 	TickWhenPaused = NewTickWhenPaused;
@@ -144,7 +160,7 @@ void UNiagaraSystemWidget::UpdateTickWhenPaused(bool NewTickWhenPaused)
 	if (NiagaraComponent)
 	{
 		NiagaraComponent->SetTickableWhenPaused(NewTickWhenPaused);
-		NiagaraComponent->SetForceSolo(NewTickWhenPaused);
+		NiagaraComponent->SetForceSolo(NewTickWhenPaused || bIgnoreTimeDilation);
 		NiagaraComponent->ResetSystem();
 	}
 }
