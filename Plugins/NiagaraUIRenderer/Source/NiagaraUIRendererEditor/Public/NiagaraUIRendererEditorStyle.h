@@ -33,8 +33,6 @@ public:
 	const static FColor WarningBoxComplementaryColor;
 	
 private:
-	static FString InContent(const FString& RelativePath, const ANSICHAR* Extension);
-	
 	class FStyle : public FSlateStyleSet
 	{
 	public:
@@ -44,6 +42,8 @@ private:
 		FButtonStyle IgnoreButtonFix;
 		FButtonStyle AutoPopulateButton;
 		FTextBlockStyle IgnoreButtonText;
+
+		void Initialize();
 	};
 	
 	static TSharedPtr<FNiagaraUIRendererEditorStyle::FStyle> StyleSet;
