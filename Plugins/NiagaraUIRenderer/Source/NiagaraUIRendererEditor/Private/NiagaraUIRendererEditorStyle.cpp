@@ -5,81 +5,23 @@
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Styling/CoreStyle.h"
-
-#define IMAGE_PLUGIN_BRUSH( RelativePath, ... ) FSlateImageBrush(FNiagaraUIRendererEditorStyle::InContent(RelativePath, ".png"), __VA_ARGS__)
-#define BOX_PLUGIN_BRUSH( RelativePath, ... ) FSlateBoxBrush(FNiagaraUIRendererEditorStyle::InContent(RelativePath, ".png"), __VA_ARGS__)
-#define DEFAULT_FONT(...) FCoreStyle::GetDefaultFontStyle(__VA_ARGS__)
+#include "Styling/SlateStyleMacros.h"
 
 TSharedPtr<FNiagaraUIRendererEditorStyle::FStyle> FNiagaraUIRendererEditorStyle::StyleSet = nullptr;
 
 const FColor FNiagaraUIRendererEditorStyle::WarningBoxComplementaryColor = FColor(232, 63 ,69);
-
-FString FNiagaraUIRendererEditorStyle::InContent(const FString& RelativePath, const ANSICHAR* Extension)
-{
-	static FString ContentDir = IPluginManager::Get().FindPlugin(TEXT("NiagaraUIRenderer"))->GetContentDir();
-	return (ContentDir / RelativePath) + Extension;
-}
 
 FNiagaraUIRendererEditorStyle::FStyle::FStyle(const FName& InStyleSetName) : FSlateStyleSet(InStyleSetName)
 {
 }
 
 void FNiagaraUIRendererEditorStyle::Initialize()
-{	
-	// Const icon sizes
-	const FVector2D Icon8x8(8.0f, 8.0f);
-	const FVector2D Icon16x16(16.0f, 16.0f);
-	const FVector2D Icon20x20(20.0f, 20.0f);
-	const FVector2D Icon25x25(25.0f, 25.0f);
-	const FVector2D Icon40x40(40.0f, 40.0f);
-	
+{
 	if (StyleSet.IsValid())
 		return;
 
 	StyleSet = MakeShareable(new FNiagaraUIRendererEditorStyle::FStyle(GetStyleSetName()));
-	StyleSet->SetContentRoot(FPaths::EngineContentDir() / TEXT("Editor/Slate"));
-	StyleSet->SetCoreContentRoot(FPaths::EngineContentDir() / TEXT("Slate"));
-
-	FNiagaraUIRendererEditorStyle::FStyle& Style = *StyleSet.Get();
-	
-	{
-		Style.Set("ClassIcon.NiagaraSystemWidget", new IMAGE_PLUGIN_BRUSH("Editor/Icons/ParticleIcon", Icon16x16));
-		Style.Set("NiagaraUIRendererEditorStyle.ParticleIcon", new IMAGE_PLUGIN_BRUSH("Editor/Icons/ParticleIcon_CB", Icon16x16));
-		Style.Set("NiagaraUIRendererEditorStyle.WarningBox.WarningIcon", new IMAGE_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_WarningIcon", Icon25x25));
-		Style.Set("NiagaraUIRendererEditorStyle.WarningBox.Refresh", new IMAGE_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_Refresh", Icon20x20));
-		Style.Set("NiagaraUIRendererEditorStyle.WarningBox.Bottom", new BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_RoundBottom", FMargin(16/256.0f)));
-		Style.Set("NiagaraUIRendererEditorStyle.WarningBox.Top", new BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_RoundTop", FMargin(16/256.0f)));
-	}
-
-	Style.IgnoreButton = FButtonStyle()
-			.SetNormal(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButton", FMargin(16/256.0f), FLinearColor(WarningBoxComplementaryColor)))
-			.SetHovered(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButton", FMargin(16/256.0f), FLinearColor(FColor(232, 63 ,69, 175))))
-			.SetPressed(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButton", FMargin(16/256.0f), FLinearColor(FColor(60, 60 ,60, 255))))
-			.SetNormalPadding(FMargin(0,0,0,0))
-			.SetPressedPadding(FMargin(0,0,0,0));
-	
-	Style.IgnoreButtonFix = FButtonStyle()
-			.SetNormal(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButtonFix", FMargin(16/256.0f), FLinearColor(WarningBoxComplementaryColor)))
-			.SetHovered(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButtonFix", FMargin(16/256.0f), FLinearColor(FColor(232, 63 ,69, 175))))
-			.SetPressed(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButtonFix", FMargin(16/256.0f), FLinearColor(FColor(60, 60 ,60, 255))))
-			.SetNormalPadding(FMargin(0,0,0,0))
-			.SetPressedPadding(FMargin(0,0,0,0));
-	
-	Style.AutoPopulateButton = FButtonStyle()
-			.SetNormal(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_AutoPopulateButton", FMargin(16/256.0f), FLinearColor(FColor(60, 60, 60))))
-			.SetHovered(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_AutoPopulateButton", FMargin(16/256.0f), FLinearColor(FColor(60, 60, 60, 125))))
-			.SetPressed(BOX_PLUGIN_BRUSH("Editor/Icons/NiagaraWarningBox_AutoPopulateButton", FMargin(16/256.0f), FLinearColor(FColor(80, 80, 80))))
-			.SetNormalPadding(FMargin(0,0,0,0))
-			.SetPressedPadding(FMargin(0,0,0,0));
-	
-	Style.Set("NiagaraUIRendererEditorStyle.WarningBox.IgnoreButton", Style.IgnoreButton);
-	Style.Set("NiagaraUIRendererEditorStyle.WarningBox.IgnoreButtonFix", Style.IgnoreButtonFix);
-	Style.Set("NiagaraUIRendererEditorStyle.WarningBox.AutoPopulateButton", Style.AutoPopulateButton);
-
-	Style.Set("NiagaraUIRendererEditorStyle.IgnoreButtonText", FTextBlockStyle(Style.IgnoreButtonText)
-			.SetFont(DEFAULT_FONT("Bold", 10))
-			.SetColorAndOpacity(FLinearColor(1.0f, 1.0f, 1.0f)));
-
+	StyleSet->Initialize();
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 }
 
@@ -104,4 +46,48 @@ FName FNiagaraUIRendererEditorStyle::GetStyleSetName()
 	return NiagaraUIRendererStyle;
 }
 
-#undef IMAGE_PLUGIN_BRUSH
+void FNiagaraUIRendererEditorStyle::FStyle::Initialize()
+{	
+	const FString PluginContentDir = IPluginManager::Get().FindPlugin(TEXT("NiagaraUIRenderer"))->GetContentDir();
+	SetContentRoot(PluginContentDir);
+	SetCoreContentRoot(PluginContentDir);
+
+	{
+		Set("ClassIcon.NiagaraSystemWidget", new IMAGE_BRUSH("Editor/Icons/ParticleIcon", CoreStyleConstants::Icon16x16));
+		Set("NiagaraUIRendererEditorStyle.ParticleIcon", new IMAGE_BRUSH("Editor/Icons/ParticleIcon_CB", CoreStyleConstants::Icon16x16));
+		Set("NiagaraUIRendererEditorStyle.WarningBox.WarningIcon", new IMAGE_BRUSH("Editor/Icons/NiagaraWarningBox_WarningIcon", CoreStyleConstants::Icon25x25));
+		Set("NiagaraUIRendererEditorStyle.WarningBox.Refresh", new IMAGE_BRUSH("Editor/Icons/NiagaraWarningBox_Refresh", CoreStyleConstants::Icon20x20));
+		Set("NiagaraUIRendererEditorStyle.WarningBox.Bottom", new BOX_BRUSH("Editor/Icons/NiagaraWarningBox_RoundBottom", FMargin(16/256.0f)));
+		Set("NiagaraUIRendererEditorStyle.WarningBox.Top", new BOX_BRUSH("Editor/Icons/NiagaraWarningBox_RoundTop", FMargin(16/256.0f)));
+	}
+
+	IgnoreButton = FButtonStyle()
+			.SetNormal(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButton", FMargin(16/256.0f), FLinearColor(WarningBoxComplementaryColor)))
+			.SetHovered(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButton", FMargin(16/256.0f), FLinearColor(FColor(232, 63 ,69, 175))))
+			.SetPressed(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButton", FMargin(16/256.0f), FLinearColor(FColor(60, 60 ,60, 255))))
+			.SetNormalPadding(FMargin(0,0,0,0))
+			.SetPressedPadding(FMargin(0,0,0,0));
+	
+	IgnoreButtonFix = FButtonStyle()
+			.SetNormal(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButtonFix", FMargin(16/256.0f), FLinearColor(WarningBoxComplementaryColor)))
+			.SetHovered(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButtonFix", FMargin(16/256.0f), FLinearColor(FColor(232, 63 ,69, 175))))
+			.SetPressed(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_IgnoreButtonFix", FMargin(16/256.0f), FLinearColor(FColor(60, 60 ,60, 255))))
+			.SetNormalPadding(FMargin(0,0,0,0))
+			.SetPressedPadding(FMargin(0,0,0,0));
+	
+	AutoPopulateButton = FButtonStyle()
+			.SetNormal(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_AutoPopulateButton", FMargin(16/256.0f), FLinearColor(FColor(60, 60, 60))))
+			.SetHovered(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_AutoPopulateButton", FMargin(16/256.0f), FLinearColor(FColor(60, 60, 60, 125))))
+			.SetPressed(BOX_BRUSH("Editor/Icons/NiagaraWarningBox_AutoPopulateButton", FMargin(16/256.0f), FLinearColor(FColor(80, 80, 80))))
+			.SetNormalPadding(FMargin(0,0,0,0))
+			.SetPressedPadding(FMargin(0,0,0,0));
+	
+	Set("NiagaraUIRendererEditorStyle.WarningBox.IgnoreButton", IgnoreButton);
+	Set("NiagaraUIRendererEditorStyle.WarningBox.IgnoreButtonFix", IgnoreButtonFix);
+	Set("NiagaraUIRendererEditorStyle.WarningBox.AutoPopulateButton", AutoPopulateButton);
+
+	Set("NiagaraUIRendererEditorStyle.IgnoreButtonText", FTextBlockStyle(IgnoreButtonText)
+			.SetFont(DEFAULT_FONT("Bold", 10))
+			.SetColorAndOpacity(FLinearColor(1.0f, 1.0f, 1.0f)));
+}
+
