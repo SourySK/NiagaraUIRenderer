@@ -16,8 +16,9 @@
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Images/SImage.h"
 #include "Editor.h"
+#include "Misc/EngineVersionComparison.h"
 
-#if ENGINE_MINOR_VERSION >= 2
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,2,0)
 #include "MaterialDomain.h"
 #endif
 
@@ -131,8 +132,8 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 
 	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
-		
-#if ENGINE_MINOR_VERSION < 1
+
+#if UE_VERSION_OLDER_THAN(5,1,0)
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			if (Emitter->SimTarget != ENiagaraSimTarget::CPUSim)
@@ -177,7 +178,7 @@ void FNiagaraWidgetDetailCustomization::CheckWarnings()
 		}
 #else
 
-#if ENGINE_MINOR_VERSION >= 4
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,4,0)
 		FVersionedNiagaraEmitter Emitter = EmitterInst->GetVersionedEmitter();
 #else
 		FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
@@ -267,7 +268,7 @@ void FNiagaraWidgetDetailCustomization::DisplayWarningBox(IDetailLayoutBuilder& 
 		.WholeRowContent()
 		[
 			SNew(SBorder)
-#if ENGINE_MINOR_VERSION < 1
+#if UE_VERSION_OLDER_THAN(5,1,0)
 			.BorderImage(FEditorStyle::GetBrush("NoBorder"))
 #else
 			.BorderImage(FAppStyle::GetBrush("NoBorder"))
@@ -392,7 +393,7 @@ void FNiagaraWidgetDetailCustomization::OnAutoPopulatePressed()
 
 	for(TSharedRef<const FNiagaraEmitterInstance> EmitterInst : NiagaraComponent->GetSystemInstanceController()->GetSystemInstance_Unsafe()->GetEmitters())
 	{
-#if ENGINE_MINOR_VERSION < 1
+#if UE_VERSION_OLDER_THAN(5,1,0)
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			if (Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
@@ -400,7 +401,7 @@ void FNiagaraWidgetDetailCustomization::OnAutoPopulatePressed()
 				TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
 #else
 
-#if ENGINE_MINOR_VERSION >= 4
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,4,0)
 		if (FVersionedNiagaraEmitterData* EmitterData = EmitterInst->GetVersionedEmitter().GetEmitterData())
 #else
 		if (FVersionedNiagaraEmitterData* EmitterData = EmitterInst->GetCachedEmitterData())
