@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"Version": 1,
+	"Version": 2,
 	"VersionName": "1.1.10",
 	"EngineVersion": "5.8.0",
 	"FriendlyName": "Niagara UI Renderer",
