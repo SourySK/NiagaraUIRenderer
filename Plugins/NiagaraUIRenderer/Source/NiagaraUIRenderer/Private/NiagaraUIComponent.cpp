@@ -7,7 +7,7 @@
 #include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystemInstanceController.h"
 #include "SNiagaraUISystemWidget.h"
-
+#include "Misc/EngineVersionComparison.h"
 
 DECLARE_STATS_GROUP(TEXT("NiagaraUI"), STATGROUP_NiagaraUI, STATCAT_Advanced);
 DECLARE_CYCLE_STAT(TEXT("Generate Sprite Data"), STAT_GenerateSpriteData, STATGROUP_NiagaraUI);
@@ -60,7 +60,7 @@ void UNiagaraUIComponent::SetTransformationForUIRendering(FVector2D Location, FV
 	HasSetTransform = true;
 }
 
-#if ENGINE_MINOR_VERSION < 1
+#if UE_VERSION_OLDER_THAN(5,1,0)
 struct FNiagaraRendererEntry
 {
 	FNiagaraRendererEntry(UNiagaraRendererProperties* PropertiesIn, TSharedRef<const FNiagaraEmitterInstance> EmitterInstIn, UNiagaraEmitter* EmitterIn)
@@ -99,7 +99,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, const 
 		if (EmitterInst->IsDisabled())
 			continue;
 			
-#if ENGINE_MINOR_VERSION < 1
+#if UE_VERSION_OLDER_THAN(5,1,0)
 		if (UNiagaraEmitter* Emitter = EmitterInst->GetCachedEmitter())
 		{
 			TArray<UNiagaraRendererProperties*> Properties = Emitter->GetRenderers();
@@ -111,7 +111,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, const 
 			}
 		}
 #else
-		#if ENGINE_MINOR_VERSION < 4
+		#if UE_VERSION_OLDER_THAN(5,4,0)
 			FVersionedNiagaraEmitter Emitter = EmitterInst->GetCachedEmitter();
 		#else
 			FVersionedNiagaraEmitter Emitter = EmitterInst->GetVersionedEmitter();
@@ -134,7 +134,7 @@ void UNiagaraUIComponent::RenderUI(SNiagaraUISystemWidget* NiagaraWidget, const 
 			
 	for (FNiagaraRendererEntry Renderer : Renderers)
 	{
-#if ENGINE_MINOR_VERSION < 1
+#if UE_VERSION_OLDER_THAN(5,1,0)
 		if (Renderer.RendererProperties && Renderer.RendererProperties->GetIsEnabled() && Renderer.RendererProperties->IsSimTargetSupported(Renderer.Emitter->SimTarget))
 		{
 			if (Renderer.Emitter->SimTarget == ENiagaraSimTarget::CPUSim)
@@ -174,7 +174,7 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	FVector ComponentScale = GetRelativeScale3D();
 	float WidgetRotationAngleRadians = FMath::DegreesToRadians(WidgetRotationAngle);
 
-#if ENGINE_MINOR_VERSION < 4
+#if UE_VERSION_OLDER_THAN(5,4,0)
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
 #else
 	const FNiagaraDataSet& DataSet = EmitterInst->GetParticleData();
@@ -195,9 +195,9 @@ void UNiagaraUIComponent::AddSpriteRendererData(SNiagaraUISystemWidget* NiagaraW
 	const FLinearColor& Tint = RenderProperties.Tint;
 
 	
-#if ENGINE_MINOR_VERSION < 1		
+#if UE_VERSION_OLDER_THAN(5,1,0)		
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
-#elif ENGINE_MINOR_VERSION < 4
+#elif UE_VERSION_OLDER_THAN(5,4,0)
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
 #else
 	bool LocalSpace = EmitterInst->GetVersionedEmitter().GetEmitterData()->bLocalSpace;
@@ -406,7 +406,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	FVector ComponentLocation = GetRelativeLocation();
 	FVector ComponentScale = GetRelativeScale3D();
 
-#if ENGINE_MINOR_VERSION < 4
+#if UE_VERSION_OLDER_THAN(5,4,0)
 	FNiagaraDataSet& DataSet = EmitterInst->GetData();
 #else
 	const FNiagaraDataSet& DataSet = EmitterInst->GetParticleData();
@@ -426,7 +426,7 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 	const FVector2f& ParentTopLeft = RenderProperties.ParentTopLeft;
 	const FLinearColor& Tint = RenderProperties.Tint;
 	
-#if ENGINE_MINOR_VERSION < 3
+#if UE_VERSION_OLDER_THAN(5,3,0)
 	const auto SortKeyReader = RibbonRenderer->SortKeyDataSetAccessor.GetReader(DataSet);
 
 	if (!ensureMsgf(SortKeyReader.IsValid(), TEXT("Invalid Sort Key Reader encrountered while rendering ribbon particles. This can happen if the particle is missing \"Particle State\" module.")))
@@ -488,9 +488,9 @@ void UNiagaraUIComponent::AddRibbonRendererData(SNiagaraUISystemWidget* NiagaraW
 		return DynamicMaterialData.GetSafe(Index, FVector4f(0.f, 0.f, 0.f, 0.f));
 	};
 
-#if ENGINE_MINOR_VERSION < 1		
+#if UE_VERSION_OLDER_THAN(5,1,0)		
 	bool LocalSpace = EmitterInst->GetCachedEmitter()->bLocalSpace;
-#elif ENGINE_MINOR_VERSION < 4
+#elif UE_VERSION_OLDER_THAN(5,4,0)
 	bool LocalSpace = EmitterInst->GetCachedEmitterData()->bLocalSpace;
 #else
 	bool LocalSpace = EmitterInst->GetVersionedEmitter().GetEmitterData()->bLocalSpace;
